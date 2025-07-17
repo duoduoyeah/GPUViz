@@ -1,50 +1,55 @@
 // src/App.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AppLayout } from './components/Layout/AppLayout';
 import { ConfigPanel } from './components/ConfigPanel/ConfigPanel';
 import { GraphCanvas } from './components/GraphCanvas/GraphCanvas';
-// Import your stores and utils here
-// import { useGPUStore } from './store/gpuStore';
-// import { generateGPUArchitecture } from './utils/gpuGenerator';
-// import { calculateLayout } from './utils/graphHelpers';
+import useGPUStore from './store/gpuStore';
+import useGraphStore from './store/graphStore';
+import { generateGPUArchitecture } from './utils/gpuGenerator';
+import { calculateLayout, generateEdges } from './utils/graphHelpers';
+import type { GPUConfig } from './models/gpu.types';
 
 const App: React.FC = () => {
-  const [nodes, setNodes] = useState<any[]>([]);
-  const [edges, setEdges] = useState<any[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  
+  // Get store hooks
+  const { config, updateConfig } = useGPUStore();
+  const { nodes, edges, setGraphData } = useGraphStore();
 
-  const handleConfigChange = (config: any) => {
-    // Update store with new config
-    console.log('Config changed:', config);
+  // Generate initial architecture on mount
+  useEffect(() => {
+    handleGenerate();
+  }, []);
+
+  const handleConfigChange = (newConfig: GPUConfig) => {
+    // Update the GPU store with new configuration
+    updateConfig(newConfig);
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     setIsGenerating(true);
     
-    // Simulate generation process
-    setTimeout(() => {
-      // Here you would:
-      // 1. Call generateGPUArchitecture(config)
-      // 2. Call calculateLayout(components)
-      // 3. Update nodes and edges
+    try {
+      // Small delay for UI feedback
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Example placeholder nodes
-      const exampleNodes = [
-        {
-          data: { id: 'shader-array-0', name: 'Shader Array 0', type: 'shader-array', color: '#4A90E2' },
-          position: { x: 100, y: 100 },
-          classes: ['gpu-component', 'shader-array']
-        },
-        {
-          data: { id: 'mem-controller-0', name: 'Memory Controller 0', type: 'memory-controller', color: '#50C878' },
-          position: { x: 150, y: 400 },
-          classes: ['gpu-component', 'memory-controller']
-        }
-      ];
+      // Generate GPU components based on current config
+      const components = generateGPUArchitecture(config);
       
-      setNodes(exampleNodes);
+      // Calculate layout for the components
+      const layoutNodes = calculateLayout(components);
+      
+      // Generate edges between components
+      const graphEdges = generateEdges(components);
+      
+      // Update the graph store with new data
+      setGraphData(layoutNodes, graphEdges);
+      
+    } catch (error) {
+      console.error('Error generating GPU architecture:', error);
+    } finally {
       setIsGenerating(false);
-    }, 1000);
+    }
   };
 
   return (

@@ -21,16 +21,19 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, isLoadin
         'shape': 'rectangle',
         'width': 150,
         'height': 80,
-        'label': 'data(name)',
+        'label': 'data(label)',
         'text-valign': 'center',
         'text-halign': 'center',
         'background-color': 'data(color)',
         'border-width': 3,
         'border-color': '#333',
-        'font-size': 12,
+        'font-size': 14,
         'font-weight': 'bold',
         'text-wrap': 'wrap',
-        'text-max-width': 140
+        'text-max-width': 140,
+        'color': '#fff',
+        'text-outline-width': 2,
+        'text-outline-color': '#333'
       }
     },
     {
@@ -40,7 +43,8 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, isLoadin
         'line-color': '#999',
         'target-arrow-color': '#999',
         'target-arrow-shape': 'triangle',
-        'curve-style': 'bezier'
+        'curve-style': 'bezier',
+        'arrow-scale': 1.5
       }
     },
     {
@@ -94,6 +98,9 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, isLoadin
     // Enable node dragging
     cyRef.current.nodes().grabify();
 
+    // Fit to viewport with padding
+    cyRef.current.fit(undefined, 50);
+
     return () => {
       if (cyRef.current) {
         cyRef.current.destroy();
@@ -108,6 +115,11 @@ export const GraphCanvas: React.FC<GraphCanvasProps> = ({ nodes, edges, isLoadin
     cyRef.current.elements().remove();
     cyRef.current.add([...nodes, ...edges]);
     cyRef.current.layout({ name: 'preset' }).run();
+    
+    // Fit to viewport after updating
+    setTimeout(() => {
+      cyRef.current?.fit(undefined, 50);
+    }, 100);
   }, [nodes, edges]);
 
   return (

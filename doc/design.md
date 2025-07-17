@@ -8,7 +8,7 @@ A web project where users can configure a GPU (e.g., memory size, core count) an
   - **Top level**: Displays a high-level view of the GPU, showing large components like shader arrays.
   - **Second level**: Zooms in to reveal more details within components, such as the structure of a shader array.
   - **Third level**: Zooms further to show even finer details, like the structure within a compute unit.
-  
+
 - **Middle-gap level**: Between component levels, a middle level will show the connections between components, providing more insight into how they interact.
   - For example, between the top and second levels, it will show multiple shader arrays and their connections.
 
@@ -21,6 +21,7 @@ A web project where users can configure a GPU (e.g., memory size, core count) an
 
 - **Phase 1**: Initial design of the basic structure and levels.
 - **Phase 2**: Focus on the middle-gap-level to display connections in more detail.
+- **Phase 3**: There will be multi-gpus graph support, then something like PCIE, etc
 
 
 ### Tech Stack

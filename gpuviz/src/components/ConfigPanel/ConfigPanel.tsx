@@ -31,7 +31,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onConfigChange, onGene
     clockSpeed: 1500
   });
 
-  const [debounceTimer, setDebounceTimer] = useState<NodeJS.Timeout | null>(null);
+  const [debounceTimer, setDebounceTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const handleConfigChange = useCallback((key: keyof GPUConfig, value: number) => {
     const newConfig = { ...config, [key]: value };
