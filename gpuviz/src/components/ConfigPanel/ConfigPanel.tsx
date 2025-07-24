@@ -1,119 +1,132 @@
-// src/components/ConfigPanel/ConfigPanel.tsx
-import React, { useState, useCallback } from 'react';
-import {
-  ConfigPanelContainer,
-  Title,
-  ConfigSection,
-  Label,
-  SliderContainer,
-  Slider,
-  ValueDisplay,
-  GenerateButton
-} from './ConfigPanel.styles';
+import React, { useState } from 'react';
+import { styles } from './ConfigPanel.styles';
 
 interface ConfigPanelProps {
-  onConfigChange: (config: GPUConfig) => void;
-  onGenerate: () => void;
+  onSubmit: (config: {
+    level: number;
+    filter: 'all' | 'memory' | 'compute';
+    selectedItems: string[];
+  }) => void;
 }
 
-interface GPUConfig {
-  memorySize: number;
-  coreCount: number;
-  shaderArrayCount: number;
-  clockSpeed: number;
-}
+// Mock data - replace with actual data source
+const mockItems = {
+  all: ['item-A', 'item-B', 'item-C', 'item-D'],
+  memory: ['mem-1', 'mem-2', 'mem-3'],
+  compute: ['comp-1', 'comp-2', 'comp-3']
+};
 
-export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onConfigChange, onGenerate }) => {
-  const [config, setConfig] = useState<GPUConfig>({
-    memorySize: 16,
-    coreCount: 4096,
-    shaderArrayCount: 4,
-    clockSpeed: 1500
-  });
+export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [level, setLevel] = useState(1);
+  const [filter, setFilter] = useState<'all' | 'memory' | 'compute'>('all');
+  const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
-  const [debounceTimer, setDebounceTimer] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const handleItemToggle = (item: string) => {
+    setSelectedItems(prev =>
+      prev.includes(item)
+        ? prev.filter(i => i !== item)
+        : [...prev, item]
+    );
+  };
 
-  const handleConfigChange = useCallback((key: keyof GPUConfig, value: number) => {
-    const newConfig = { ...config, [key]: value };
-    setConfig(newConfig);
+  const handleSubmit = () => {
+    onSubmit({ level, filter, selectedItems });
+  };
 
-    // Debounced update to parent
-    if (debounceTimer) {
-      clearTimeout(debounceTimer);
-    }
-    const timer = setTimeout(() => {
-      onConfigChange(newConfig);
-    }, 300);
-    setDebounceTimer(timer);
-  }, [config, debounceTimer, onConfigChange]);
+  const getFilteredItems = () => {
+    // TODO: Filter items based on level and filter type
+    // This is mock implementation
+    return mockItems[filter];
+  };
+
+  if (isCollapsed) {
+    return (
+      <div style={styles.collapsedContainer}>
+        <button onClick={() => setIsCollapsed(false)}>▶</button>
+      </div>
+    );
+  }
 
   return (
-    <ConfigPanelContainer>
-      <Title>GPU Configuration</Title>
-      
-      <ConfigSection>
-        <Label>Memory Size: {config.memorySize} GB</Label>
-        <SliderContainer>
-          <Slider
-            type="range"
-            min="4"
-            max="64"
-            step="4"
-            value={config.memorySize}
-            onChange={(e) => handleConfigChange('memorySize', Number(e.target.value))}
-          />
-          <ValueDisplay>{config.memorySize}GB</ValueDisplay>
-        </SliderContainer>
-      </ConfigSection>
+    <div style={styles.mainContainer}>
+      {/* Header */}
+      <div style={styles.header}>
+        <button 
+          onClick={() => setIsCollapsed(true)}
+          style={styles.chevronButton}
+        >
+          ◀
+        </button>
+        <span style={styles.title}>GPU Config</span>
+      </div>
 
-      <ConfigSection>
-        <Label>Core Count: {config.coreCount}</Label>
-        <SliderContainer>
-          <Slider
-            type="range"
-            min="1024"
-            max="16384"
-            step="1024"
-            value={config.coreCount}
-            onChange={(e) => handleConfigChange('coreCount', Number(e.target.value))}
+      {/* Level selector */}
+      <div style={styles.section}>
+        <label>
+          Hierarchy Level: 
+          <input
+            type="number"
+            value={level}
+            onChange={(e) => setLevel(Number(e.target.value))}
+            min={0}
+            style={styles.levelInput}
           />
-          <ValueDisplay>{config.coreCount}</ValueDisplay>
-        </SliderContainer>
-      </ConfigSection>
+        </label>
+      </div>
 
-      <ConfigSection>
-        <Label>Shader Arrays: {config.shaderArrayCount}</Label>
-        <SliderContainer>
-          <Slider
-            type="range"
-            min="2"
-            max="8"
-            step="1"
-            value={config.shaderArrayCount}
-            onChange={(e) => handleConfigChange('shaderArrayCount', Number(e.target.value))}
-          />
-          <ValueDisplay>{config.shaderArrayCount}</ValueDisplay>
-        </SliderContainer>
-      </ConfigSection>
+      {/* Filter toggle */}
+      <div style={styles.section}>
+        <div>Show:</div>
+        <div style={styles.filterButtonGroup}>
+          <button
+            onClick={() => setFilter('all')}
+            style={styles.filterButton(filter === 'all')}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('memory')}
+            style={styles.filterButton(filter === 'memory')}
+          >
+            Memory
+          </button>
+          <button
+            onClick={() => setFilter('compute')}
+            style={styles.filterButton(filter === 'compute')}
+          >
+            Compute
+          </button>
+        </div>
+      </div>
 
-      <ConfigSection>
-        <Label>Clock Speed: {config.clockSpeed} MHz</Label>
-        <SliderContainer>
-          <Slider
-            type="range"
-            min="1000"
-            max="2500"
-            step="100"
-            value={config.clockSpeed}
-            onChange={(e) => handleConfigChange('clockSpeed', Number(e.target.value))}
-          />
-          <ValueDisplay>{config.clockSpeed}MHz</ValueDisplay>
-        </SliderContainer>
-      </ConfigSection>
+      {/* Item list */}
+      <div style={styles.itemList}>
+        {getFilteredItems().map(item => (
+          <label
+            key={item}
+            style={styles.itemLabel}
+          >
+            <input
+              type="checkbox"
+              checked={selectedItems.includes(item)}
+              onChange={() => handleItemToggle(item)}
+              style={styles.itemCheckbox}
+            />
+            {item}
+          </label>
+        ))}
+      </div>
 
-      <GenerateButton onClick={onGenerate}>
-        Generate GPU Architecture
-      </GenerateButton>
-    </ConfigPanelContainer>
+      {/* Submit button */}
+      <div style={styles.submitSection}>
+        <button
+          onClick={handleSubmit}
+          style={styles.submitButton}
+        >
+          Update Graph
+        </button>
+      </div>
+    </div>
   );
 };

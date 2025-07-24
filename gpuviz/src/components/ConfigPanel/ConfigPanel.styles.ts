@@ -1,94 +1,96 @@
-// src/components/ConfigPanel/ConfigPanel.styles.ts
-import styled from 'styled-components';
+import type { CSSProperties } from 'react';
 
-export const ConfigPanelContainer = styled.div`
-  width: 300px;
-  padding: 20px;
-  background-color: #f5f5f5;
-  border-right: 1px solid #ddd;
-  height: 100vh;
-  overflow-y: auto;
-`;
+export const styles = {
+  collapsedContainer: {
+    position: 'fixed',
+    left: 0,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    backgroundColor: '#f0f0f0',
+    padding: '8px',
+    cursor: 'pointer',
+    borderRadius: '0 4px 4px 0'
+  } as CSSProperties,
 
-export const Title = styled.h2`
-  margin-bottom: 20px;
-  color: #333;
-`;
+  mainContainer: {
+    position: 'fixed',
+    left: 0,
+    top: 0,
+    height: '100vh',
+    width: '250px',
+    backgroundColor: '#f5f5f5',
+    borderRight: '1px solid #ddd',
+    display: 'flex',
+    flexDirection: 'column'
+  } as CSSProperties,
 
-export const ConfigSection = styled.div`
-  margin-bottom: 20px;
-`;
+  header: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '16px',
+    borderBottom: '1px solid #ddd'
+  } as CSSProperties,
 
-export const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-  font-weight: 500;
-  color: #555;
-`;
+  chevronButton: {
+    marginRight: '8px',
+    cursor: 'pointer'
+  } as CSSProperties,
 
-export const SliderContainer = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-`;
+  title: {
+    fontWeight: 'bold'
+  } as CSSProperties,
 
-export const Slider = styled.input`
-  flex: 1;
-  height: 5px;
-  background: #ddd;
-  outline: none;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  cursor: pointer;
+  section: {
+    padding: '16px',
+    borderBottom: '1px solid #ddd'
+  } as CSSProperties,
 
-  &:hover {
-    opacity: 1;
-  }
+  levelInput: {
+    marginLeft: '8px',
+    width: '60px'
+  } as CSSProperties,
 
-  &::-webkit-slider-thumb {
-    appearance: none;
-    width: 15px;
-    height: 15px;
-    background: #4A90E2;
-    cursor: pointer;
-    border-radius: 50%;
-  }
+  filterButtonGroup: {
+    marginTop: '8px'
+  } as CSSProperties,
 
-  &::-moz-range-thumb {
-    width: 15px;
-    height: 15px;
-    background: #4A90E2;
-    cursor: pointer;
-    border-radius: 50%;
-    border: none;
-  }
-`;
+  filterButton: (isActive: boolean): CSSProperties => ({
+    padding: '4px 12px',
+    marginRight: '4px',
+    backgroundColor: isActive ? '#4CAF50' : '#fff',
+    color: isActive ? '#fff' : '#000',
+    border: '1px solid #ccc',
+    cursor: 'pointer'
+  }),
 
-export const ValueDisplay = styled.span`
-  min-width: 60px;
-  text-align: right;
-  font-weight: 600;
-  color: #4A90E2;
-`;
+  itemList: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '16px',
+    borderBottom: '1px solid #ddd'
+  } as CSSProperties,
 
-export const GenerateButton = styled.button`
-  width: 100%;
-  padding: 12px;
-  margin-top: 20px;
-  background-color: #4A90E2;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  itemLabel: {
+    display: 'block',
+    marginBottom: '8px',
+    cursor: 'pointer'
+  } as CSSProperties,
 
-  &:hover {
-    background-color: #357ABD;
-  }
+  itemCheckbox: {
+    marginRight: '8px'
+  } as CSSProperties,
 
-  &:active {
-    background-color: #2968A3;
-  }
-`;
+  submitSection: {
+    padding: '16px'
+  } as CSSProperties,
+
+  submitButton: {
+    width: '100%',
+    padding: '8px',
+    backgroundColor: '#2196F3',
+    color: 'white',
+    border: 'none',
+    cursor: 'pointer',
+    fontSize: '16px'
+  } as CSSProperties
+};

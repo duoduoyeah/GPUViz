@@ -1,92 +1,111 @@
 import { create } from 'zustand';
+import { ComponentTree } from '../models/componentTree';
+import { ComponentGraph } from '../models/componentGraph';
+import type { NodeInfo } from '../types';
 
-interface GPUConfig {
-    memorySize: number;
-    coreCount: number;
-    shaderArrayCount: number;
-    clockSpeed: number;
+// Define the store state interface
+interface GpuStoreState<T extends NodeInfo> {
+  // Data state
+  rawData: any | null;
+  componentTree: ComponentTree<T> | null;
+  componentGraph: ComponentGraph<T> | null;
+  activeLevel: number;
+  
+  // UI state
+  loading: boolean;
+  error: string | null;
+  selectedNode: string | null;
+  
+  // Filter and view settings
+  filters: {
+    componentTypes: string[];
+    showConnections: boolean;
+  };
+  
+  // Actions
+  loadData: (data: any) => void;
+  setActiveLevel: (level: number) => void;
+  selectNode: (nodeId: string | null) => void;
+  setFilter: (filterType: string, value: any) => void;
+  toggleConnectionVisibility: () => void;
 }
 
-interface GPUComponent {
-    id: string;
-    type: 'shader-array' | 'memory-controller' | 'command-processor' | 'cache';
-    name: string;
-    properties: Record<string, any>;
-    position?: { x: number; y: number };
-    color: string;
-}
-
-interface GPUStore {
-    config: GPUConfig;
-    components: GPUComponent[];
-    updateConfig: (config: Partial<GPUConfig>) => void;
-    generateArchitecture: () => void;
-}
-
-const useGPUStore = create<GPUStore>((set, get) => ({
-    config: {
-        memorySize: 16,
-        coreCount: 4096,
-        shaderArrayCount: 4,
-        clockSpeed: 1500
-    },
-    components: [],
-    updateConfig: (newConfig) => set((state) => ({
-        config: { ...state.config, ...newConfig }
-    })),
-    generateArchitecture: () => {
-        const { config } = get();
-        const components: GPUComponent[] = [];
-        
-        // Generate Shader Arrays
-        for (let i = 0; i < config.shaderArrayCount; i++) {
-            components.push({
-                id: `shader-array-${i}`,
-                type: 'shader-array',
-                name: `Shader Array ${i}`,
-                properties: {
-                    coresPerArray: Math.floor(config.coreCount / config.shaderArrayCount)
-                },
-                color: '#4A90E2'
-            });
-        }
-        
-        // Generate Memory Controllers
-        const memoryControllers = Math.ceil(config.memorySize / 8);
-        for (let i = 0; i < memoryControllers; i++) {
-            components.push({
-                id: `mem-controller-${i}`,
-                type: 'memory-controller',
-                name: `Memory Controller ${i}`,
-                properties: {
-                    bandwidth: '256 GB/s'
-                },
-                color: '#50C878'
-            });
-        }
-        
-        // Add Command Processor
-        components.push({
-            id: 'command-processor',
-            type: 'command-processor',
-            name: 'Command Processor',
-            properties: {},
-            color: '#FF6B6B'
-        });
-        
-        // Add L2 Cache
-        components.push({
-            id: 'l2-cache',
-            type: 'cache',
-            name: 'L2 Cache',
-            properties: {
-                size: '4 MB'
-            },
-            color: '#FFA500'
-        });
-        
-        set({ components });
+// Create the store
+const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
+  // Initial state
+  rawData: null,
+  componentTree: null,
+  componentGraph: null,
+  activeLevel: 0,
+  
+  loading: false,
+  error: null,
+  selectedNode: null,
+  
+  filters: {
+    componentTypes: [],
+    showConnections: false,
+  },
+  
+  // Actions
+  loadData: (data) => {
+    set({ loading: true, error: null });
+    
+    try {
+      // TODO: Implement data processing logic
+      // 1. Convert raw data to component tree
+      // 2. Create component graph from tree
+      
+      // Placeholder implementation:
+      set({
+        rawData: data,
+        loading: false,
+        // componentTree and componentGraph will be created here
+      });
+    } catch (error) {
+      set({
+        loading: false,
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+      });
     }
+  },
+  
+  setActiveLevel: (level) => {
+    set({ activeLevel: level });
+    
+    // When level changes, we may need to update the graph
+    const { componentTree, componentGraph } = get();
+    if (componentTree && componentGraph) {
+      // TODO: Update graph for the new level
+    }
+  },
+  
+  selectNode: (nodeId) => {
+    set({ selectedNode: nodeId });
+  },
+  
+  setFilter: (filterType, value) => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        [filterType]: value,
+      }
+    }));
+    
+    // Apply filters to update visualization
+    // TODO: Implement filtering logic
+  },
+  
+  toggleConnectionVisibility: () => {
+    set((state) => ({
+      filters: {
+        ...state.filters,
+        showConnections: !state.filters.showConnections,
+      }
+    }));
+    
+    // TODO: Update graph based on connection visibility
+  },
 }));
 
-export default useGPUStore;
+export default useGpuStore;
