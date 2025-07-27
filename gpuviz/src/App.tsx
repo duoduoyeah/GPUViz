@@ -1,73 +1,101 @@
-// src/App.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { AppLayout } from './components/Layout/AppLayout';
 import { ConfigPanel } from './components/ConfigPanel/ConfigPanel';
 import { GraphCanvas } from './components/GraphCanvas/GraphCanvas';
-import useGPUStore from './store/gpuStore';
-import useGraphStore from './store/graphStore';
-import { generateGPUArchitecture } from './utils/gpuGenerator';
-import { calculateLayout, generateEdges } from './utils/graphHelpers';
-import type { GPUConfig } from './models/gpu.types';
+import useGpuStore from './store/gpuStore';
+import { DEFAULT_DATA_PATH } from './config/default';
+import './App.css';
 
 const App: React.FC = () => {
-  const [isGenerating, setIsGenerating] = useState(false);
-  
-  // Get store hooks
-  const { config, updateConfig } = useGPUStore();
-  const { nodes, edges, setGraphData } = useGraphStore();
+  const { 
+    loadData, 
+    setActiveLevel, 
+    loading, 
+    error,
+    rawData
+  } = useGpuStore();
 
-  // Generate initial architecture on mount
+  // Load default data on app initialization
   useEffect(() => {
-    handleGenerate();
-  }, []);
+    const loadDefaultData = async () => {
+      try {
+        const response = await fetch(DEFAULT_DATA_PATH);
+        if (!response.ok) {
+          throw new Error(`Failed to load data: ${response.statusText}`);
+        }
+        const jsonData = await response.json();
+        // Log a small part of the data for debug
+        console.log('Data structure:', jsonData);
+        console.log('First component:', jsonData?.components?.[0]);
+        console.log('Total components:', jsonData?.components?.length);
+        loadData(jsonData);
+      } catch (err) {
+        console.error('Error loading default data:', err);
+        // Error is handled by the store, no need for local state
+      }
+    };
 
-  const handleConfigChange = (newConfig: GPUConfig) => {
-    // Update the GPU store with new configuration
-    updateConfig(newConfig);
-  };
-
-  const handleGenerate = async () => {
-    setIsGenerating(true);
-    
-    try {
-      // Small delay for UI feedback
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Generate GPU components based on current config
-      const components = generateGPUArchitecture(config);
-      
-      // Calculate layout for the components
-      const layoutNodes = calculateLayout(components);
-      
-      // Generate edges between components
-      const graphEdges = generateEdges(components);
-      
-      // Update the graph store with new data
-      setGraphData(layoutNodes, graphEdges);
-      
-    } catch (error) {
-      console.error('Error generating GPU architecture:', error);
-    } finally {
-      setIsGenerating(false);
+    // Only load data if we don't have any yet
+    if (!rawData && !loading && !error) {
+      loadDefaultData();
     }
+  }, [loadData, rawData, loading, error]);
+
+  // Handle config panel updates
+  const handleConfigSubmit = (config: {
+    level: number;
+    filter: 'all' | 'memory' | 'compute';
+    selectedItems: string[];
+  }) => {
+    console.log('Config updated:', config);
+    
+    // Update active level in the store
+    setActiveLevel(config.level);
+    
+    // TODO: Apply filters and selectedItems
+    // This will be implemented when filtering is added to the store
   };
+
+  // Show initial loading state
+  if (!rawData && loading && !error) {
+    return (
+      <div className="loading-container">
+        Loading GPU visualization data...
+      </div>
+    );
+  }
+
+  // Show error state if data loading failed
+  if (error && !rawData) {
+    return (
+      <div className="error-container">
+        <div className="error-title">
+          Failed to Load Data
+        </div>
+        <div className="error-message">
+          {error}
+        </div>
+        <button 
+          onClick={() => window.location.reload()}
+          className="retry-button"
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <AppLayout
-      leftPanel={
-        <ConfigPanel
-          onConfigChange={handleConfigChange}
-          onGenerate={handleGenerate}
-        />
-      }
-      rightPanel={
-        <GraphCanvas
-          nodes={nodes}
-          edges={edges}
-          isLoading={isGenerating}
-        />
-      }
-    />
+    <div className="App">
+      <AppLayout
+        leftPanel={
+          <ConfigPanel onSubmit={handleConfigSubmit} />
+        }
+        rightPanel={
+          <GraphCanvas />
+        }
+      />
+    </div>
   );
 };
 

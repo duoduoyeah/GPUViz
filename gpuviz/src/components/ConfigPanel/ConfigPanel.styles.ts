@@ -2,26 +2,24 @@ import type { CSSProperties } from 'react';
 
 export const styles = {
   collapsedContainer: {
-    position: 'fixed',
-    left: 0,
-    top: '50%',
-    transform: 'translateY(-50%)',
-    backgroundColor: '#f0f0f0',
-    padding: '8px',
+    width: '40px',
+    height: '100vh',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     cursor: 'pointer',
-    borderRadius: '0 4px 4px 0'
+    borderRight: '1px solid #ddd'
   } as CSSProperties,
 
   mainContainer: {
-    position: 'fixed',
-    left: 0,
-    top: 0,
-    height: '100vh',
     width: '250px',
-    backgroundColor: '#f5f5f5',
+    height: '100vh',
+    backgroundColor: '#ffffff',
     borderRight: '1px solid #ddd',
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    color: '#333333'
   } as CSSProperties,
 
   header: {
@@ -33,21 +31,30 @@ export const styles = {
 
   chevronButton: {
     marginRight: '8px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    background: 'transparent',
+    border: 'none',
+    fontSize: '16px',
+    padding: '4px'
   } as CSSProperties,
 
   title: {
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    color: '#333333'
   } as CSSProperties,
 
   section: {
     padding: '16px',
-    borderBottom: '1px solid #ddd'
+    borderBottom: '1px solid #ddd',
+    color: '#333333'
   } as CSSProperties,
 
   levelInput: {
     marginLeft: '8px',
-    width: '60px'
+    width: '60px',
+    padding: '4px',
+    border: '1px solid #ccc',
+    borderRadius: '4px'
   } as CSSProperties,
 
   filterButtonGroup: {
@@ -55,12 +62,14 @@ export const styles = {
   } as CSSProperties,
 
   filterButton: (isActive: boolean): CSSProperties => ({
-    padding: '4px 12px',
+    padding: '6px 12px',
     marginRight: '4px',
     backgroundColor: isActive ? '#4CAF50' : '#fff',
     color: isActive ? '#fff' : '#000',
     border: '1px solid #ccc',
-    cursor: 'pointer'
+    borderRadius: '4px',
+    cursor: 'pointer',
+    fontSize: '14px'
   }),
 
   itemList: {
@@ -73,7 +82,8 @@ export const styles = {
   itemLabel: {
     display: 'block',
     marginBottom: '8px',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    color: '#333333'
   } as CSSProperties,
 
   itemCheckbox: {
@@ -86,11 +96,13 @@ export const styles = {
 
   submitButton: {
     width: '100%',
-    padding: '8px',
+    padding: '10px',
     backgroundColor: '#2196F3',
     color: 'white',
     border: 'none',
+    borderRadius: '4px',
     cursor: 'pointer',
-    fontSize: '16px'
+    fontSize: '16px',
+    fontWeight: 'bold'
   } as CSSProperties
 };

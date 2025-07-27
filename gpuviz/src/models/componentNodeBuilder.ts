@@ -1,31 +1,8 @@
-import type { ComponentNode, Port, NodeInfo } from '../types/index';
+import type { ComponentNode, Port, NodeInfo, JsonData, JsonComponent, JsonPort } from '../types';
 import { ComponentNodeImpl } from './componentNode';
 import { PortImpl } from './port';
 
-// JSON structure interfaces
-interface JsonPort {
-   name: string;
-   incomingPort: string[];
-   outgoingPort: string[];
-}
 
-interface JsonComponent {
-   name: string;
-   ports: JsonPort[];
-}
-
-interface JsonData {
-   components: JsonComponent[];
-}
-
-interface JsonComponent {
-   name: string;
-   ports: JsonPort[];
-}
-
-interface JsonData {
-   components: JsonComponent[];
-}
 
 // Component Node Builder
 export class ComponentNodeBuilder<T extends NodeInfo> {
@@ -38,9 +15,13 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
 
     /**
     * Build component tree from JSON data
+    * @returns Array of root ComponentNode<T> objects
     */
     buildFromJson(jsonData: JsonData): ComponentNode<T>[] {
-        this.validateUniqueComponentNames(jsonData);
+        const validationError = this.validateJsonData(jsonData);
+        if (validationError) {
+            throw new Error(validationError);
+        }
 
         // First pass: Create all components
         for (const jsonComponent of jsonData.components) {
@@ -83,19 +64,19 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
        return component
    }
 
-    /**
-    * Validates that there are no duplicate component names in the JSON data
-    * @param jsonData The JSON data to validate
-    * @throws Error if duplicate component names are found
-    */
-    private validateUniqueComponentNames(jsonData: JsonData): void {
+   private validateJsonData(jsonData: JsonData): string | null {
+        return this.validateUniqueComponentNames(jsonData);
+   }
+
+    private validateUniqueComponentNames(jsonData: JsonData): string | null {
         const nameSet = new Set<string>();
         for (const jsonComponent of jsonData.components) {
             if (nameSet.has(jsonComponent.name)) {
-               throw new Error(`Duplicate component name detected: ${jsonComponent.name}`);
+               return `Duplicate component name detected: ${jsonComponent.name}`;
             }
             nameSet.add(jsonComponent.name);
         }
+        return null; // No errors found
     }
 
    private addParentComponent() {
@@ -177,17 +158,21 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
                 
                 // Connect incoming ports
                 const incomingPortsRefs: Port[] = [];
-                for (const inPortName of jsonPort.incomingPort) {
-                    const inPort = portMap.get(inPortName);
-                    if (inPort) incomingPortsRefs.push(inPort);
+                if (jsonPort.incomingPort) { 
+                    for (const inPortName of jsonPort.incomingPort) {
+                        const inPort = portMap.get(inPortName);
+                        if (inPort) incomingPortsRefs.push(inPort);
+                    }
                 }
                 port.setIncomingPorts(incomingPortsRefs);
                 
                 // Connect outgoing ports
                 const outgoingPortsRefs: Port[] = [];
-                for (const outPortName of jsonPort.outgoingPort) {
-                    const outPort = portMap.get(outPortName);
-                    if (outPort) outgoingPortsRefs.push(outPort);
+                if (jsonPort.outgoingPort) {
+                    for (const outPortName of jsonPort.outgoingPort) {
+                        const outPort = portMap.get(outPortName);
+                        if (outPort) outgoingPortsRefs.push(outPort);
+                    }
                 }
                 port.setOutgoingPorts(outgoingPortsRefs);
             }

@@ -43,7 +43,12 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
   if (isCollapsed) {
     return (
       <div style={styles.collapsedContainer}>
-        <button onClick={() => setIsCollapsed(false)}>▶</button>
+        <button 
+          onClick={() => setIsCollapsed(false)}
+          style={styles.chevronButton}
+        >
+          ▶
+        </button>
       </div>
     );
   }

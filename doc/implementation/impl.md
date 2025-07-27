@@ -8,7 +8,6 @@
 
 3. **Build basic UI components**
 
-
 ## Phase 2: Multi-Level Architecture & Level Zoom
 
 **What you should do:**

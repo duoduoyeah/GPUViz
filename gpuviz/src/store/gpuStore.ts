@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { ComponentTree } from '../models/componentTree';
 import { ComponentGraph } from '../models/componentGraph';
-import type { NodeInfo } from '../types';
+import { ComponentNodeBuilder } from '../models/componentNodeBuilder';
+import type { NodeInfo, Graph } from '../types';
 
 // Define the store state interface
 interface GpuStoreState<T extends NodeInfo> {
@@ -9,6 +10,7 @@ interface GpuStoreState<T extends NodeInfo> {
   rawData: any | null;
   componentTree: ComponentTree<T> | null;
   componentGraph: ComponentGraph<T> | null;
+  currentGraph: Graph | null;
   activeLevel: number;
   
   // UI state
@@ -36,8 +38,9 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
   rawData: null,
   componentTree: null,
   componentGraph: null,
-  activeLevel: 0,
-  
+  currentGraph: null,
+  activeLevel: 1,
+
   loading: false,
   error: null,
   selectedNode: null,
@@ -52,15 +55,35 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
     set({ loading: true, error: null });
     
     try {
-      // TODO: Implement data processing logic
-      // 1. Convert raw data to component tree
-      // 2. Create component graph from tree
+      // Create a default NodeInfo object
+      const defaultInfo: NodeInfo = {};
       
-      // Placeholder implementation:
+      // Initialize the component node builder
+      const builder = new ComponentNodeBuilder<NodeInfo>(defaultInfo);
+      
+      // 1. Convert raw data to component tree
+      const rootComponents = builder.buildFromJson(data);
+      const componentTree = new ComponentTree<NodeInfo>(rootComponents);
+      
+      // 2. Create component graph from tree
+      const componentGraph = new ComponentGraph<NodeInfo>(componentTree);
+      
+      // 3. Create initial graph at default level
+      const currentGraph = componentGraph.createGraphAtLevel(get().activeLevel);
+      console.log('Current graph at level 1:', currentGraph); 
+      console.log('Graph nodes count:', currentGraph?.nodes?.length); 
+      console.log('Graph edges count:', currentGraph?.edges?.length); 
+      
+      // Add logging when currentGraph is updated
+      console.log('🔄 currentGraph updated in loadData:', currentGraph);
+      
+      // Update store with processed data
       set({
         rawData: data,
+        componentTree,
+        componentGraph,
+        currentGraph,
         loading: false,
-        // componentTree and componentGraph will be created here
       });
     } catch (error) {
       set({
@@ -73,10 +96,17 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
   setActiveLevel: (level) => {
     set({ activeLevel: level });
     
-    // When level changes, we may need to update the graph
     const { componentTree, componentGraph } = get();
     if (componentTree && componentGraph) {
-      // TODO: Update graph for the new level
+      // Create graph for the new level and update currentGraph
+      const currentGraph = componentGraph.createGraphAtLevel(level);
+      
+      // Add logging when currentGraph is updated
+      console.log(`🔄 currentGraph updated in setActiveLevel (level ${level}):`, currentGraph);
+      console.log('Graph nodes count:', currentGraph?.nodes?.length);
+      console.log('Graph edges count:', currentGraph?.edges?.length);
+      
+      set({ currentGraph });
     }
   },
   

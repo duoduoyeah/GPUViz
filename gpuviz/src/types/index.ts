@@ -1,2 +1,4 @@
 export * from './component';
-export type { Tree } from './tree';
+export * from './tree';
+export * from './graph'
+export * from './json'

@@ -6,6 +6,9 @@
 * user input -> panel side logic -> modify the data -> give to cytoscape to update the graph
 
 ---
+07.26
+Goal: Step by step write a readable GraphCanvas.tsx
+
 07.25
 Goal: quickly show the first edition.
 1. the panel side

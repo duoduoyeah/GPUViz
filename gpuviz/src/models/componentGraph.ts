@@ -1,29 +1,8 @@
-import type { ComponentNode, NodeInfo, ComponentKind } from '../types';
+import type { ComponentNode, NodeInfo, Graph, GraphNode, GraphEdge } from '../types';
 import { ComponentTree } from './componentTree';
 
 
-interface GraphNode {
-  data: {
-    id: string;
-    label: string;
-    shape: ComponentKind;
-    type: string;
-  };
-}
 
-interface GraphEdge {
-  data: {
-    id: string;
-    source: string;
-    target: string;
-  };
-}
-
-
-interface Graph {
-  nodes: GraphNode[];
-  edges: GraphEdge[];
-}
 
 export class ComponentGraph<T extends NodeInfo> {
     private tree: ComponentTree<T>;

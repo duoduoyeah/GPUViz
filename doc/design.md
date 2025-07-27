@@ -46,5 +46,6 @@ State Management: Redux/Zustand (for dynamic updates)
 Data Processing: Web Workers (for large graph calculations)
 UI Framework: React/Vue (for controls and UI)
 
+Later, we could try: Sigma.js 
 <!-- Main: Canvas API
 Second Options:Cytoscape.js, Konva.js (Canvas-based), D3.js (with Canvas) -->
