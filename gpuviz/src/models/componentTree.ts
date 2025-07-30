@@ -15,7 +15,7 @@ export class ComponentTree<T extends NodeInfo> implements Tree<T> {
 
         this.levelMap = new Map<number, ComponentNode<T>[]>();
         this.depth = this.getDepth()
-        for (let level = 0; level < this.depth; level++) {
+        for (let level = 0; level <= this.depth; level++) {
             this.levelMap.set(level, this.setNodesAtLevel(level))
         }
     }

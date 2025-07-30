@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { AppLayout } from './components/Layout/AppLayout';
 import { ConfigPanel } from './components/ConfigPanel/ConfigPanel';
-import { GraphCanvas } from './components/GraphCanvas/GraphCanvas';
+import GraphCanvas, { type GraphCanvasHandles } from './components/GraphCanvas/GraphCanvas';
 import useGpuStore from './store/gpuStore';
 import { DEFAULT_DATA_PATH } from './config/default';
 import './App.css';
@@ -14,6 +14,7 @@ const App: React.FC = () => {
     error,
     rawData
   } = useGpuStore();
+  const graphCanvasRef = useRef<GraphCanvasHandles>(null);
 
   // Load default data on app initialization
   useEffect(() => {
@@ -24,10 +25,6 @@ const App: React.FC = () => {
           throw new Error(`Failed to load data: ${response.statusText}`);
         }
         const jsonData = await response.json();
-        // Log a small part of the data for debug
-        console.log('Data structure:', jsonData);
-        console.log('First component:', jsonData?.components?.[0]);
-        console.log('Total components:', jsonData?.components?.length);
         loadData(jsonData);
       } catch (err) {
         console.error('Error loading default data:', err);
@@ -89,10 +86,13 @@ const App: React.FC = () => {
     <div className="App">
       <AppLayout
         leftPanel={
-          <ConfigPanel onSubmit={handleConfigSubmit} />
+          <ConfigPanel 
+            onSubmit={handleConfigSubmit} 
+            graphCanvasRef={graphCanvasRef}
+          />
         }
         rightPanel={
-          <GraphCanvas />
+          <GraphCanvas ref={graphCanvasRef} />
         }
       />
     </div>

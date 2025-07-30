@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import type { RefObject } from 'react';
 import { styles } from './ConfigPanel.styles';
+import type { GraphCanvasHandles } from '../GraphCanvas/GraphCanvas';
 
 interface ConfigPanelProps {
   onSubmit: (config: {
@@ -7,6 +9,7 @@ interface ConfigPanelProps {
     filter: 'all' | 'memory' | 'compute';
     selectedItems: string[];
   }) => void;
+  graphCanvasRef: RefObject<GraphCanvasHandles | null>;
 }
 
 // Mock data - replace with actual data source
@@ -16,9 +19,9 @@ const mockItems = {
   compute: ['comp-1', 'comp-2', 'comp-3']
 };
 
-export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
+export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasRef }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState<number | ''>('');
   const [filter, setFilter] = useState<'all' | 'memory' | 'compute'>('all');
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -31,7 +34,11 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
   };
 
   const handleSubmit = () => {
-    onSubmit({ level, filter, selectedItems });
+    onSubmit({ 
+      level: typeof level === 'number' ? level : 0, 
+      filter, 
+      selectedItems 
+    });
   };
 
   const getFilteredItems = () => {
@@ -39,6 +46,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
     // This is mock implementation
     return mockItems[filter];
   };
+
+  const handleFit = () => graphCanvasRef.current?.fit();
+  const handleCenter = () => graphCanvasRef.current?.center();
+  const handleReset = () => graphCanvasRef.current?.reset();
 
   if (isCollapsed) {
     return (
@@ -69,13 +80,17 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
       {/* Level selector */}
       <div style={styles.section}>
         <label>
-          Hierarchy Level: 
+          Level: 
           <input
             type="number"
             value={level}
-            onChange={(e) => setLevel(Number(e.target.value))}
+            onChange={(e) => {
+              const value = e.target.value;
+              setLevel(value === '' ? '' : Number(value));
+            }}
             min={0}
             style={styles.levelInput}
+            placeholder="0"
           />
         </label>
       </div>
@@ -131,6 +146,16 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit }) => {
         >
           Update Graph
         </button>
+      </div>
+
+      {/* Graph Controls */}
+      <div style={styles.section}>
+        <div>Graph Controls:</div>
+        <div style={styles.filterButtonGroup}>
+          <button onClick={handleFit} style={styles.filterButton(false)}>Fit</button>
+          <button onClick={handleCenter} style={styles.filterButton(false)}>Center</button>
+          <button onClick={handleReset} style={styles.filterButton(false)}>Reset</button>
+        </div>
       </div>
     </div>
   );

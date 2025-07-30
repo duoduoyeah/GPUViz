@@ -1,202 +1,173 @@
-import React, { useEffect, useRef, useState } from 'react';
-import cytoscape from 'cytoscape';
+import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
 import useGpuStore from '../../store/gpuStore';
-import type { Graph } from '../../types';
-import { styles, cytoscapeStyles, cytoscapeLayout } from './GraphCanvas.styles';
+import { GraphCore } from './GraphCore';
+import { GraphEvents } from './GraphEvents';
+import { styles } from './GraphCanvas.styles';
+import type { LayoutType } from './GraphConfig';
+import ErrorBoundary from './ErrorBoundary';
 
-export const GraphCanvas: React.FC = () => {
-  const cyRef = useRef<HTMLDivElement>(null);
-  const cyInstance = useRef<cytoscape.Core | null>(null);
-  const [selectedNodeInfo, setSelectedNodeInfo] = useState<any>(null);
-  const [debugUpdateCounter, setDebugUpdateCounter] = useState(0);
+export interface GraphCanvasHandles {
+  fit: () => void;
+  center: () => void;
+  reset: () => void;
+  changeLayout: (layoutType: LayoutType) => void;
+  getState: () => any;
+  selectElement: (id: string) => void;
+  unselectAll: () => void;
+}
 
-  const { 
-    currentGraph, 
-    loading, 
-    error, 
-    selectedNode, 
-    selectNode
-  } = useGpuStore();
-
-  // Debug data for testing
-  const getDebugGraph = (): Graph => {
-    const baseNodes = [
-      {
-        data: {
-          id: 'node1',
-          label: `GPU Core ${debugUpdateCounter}`,
-          type: 'gpu',
-          level: 0,
-          utilization: Math.random() * 100
-        }
-      },
-      {
-        data: {
-          id: 'node2',
-          label: `Memory ${debugUpdateCounter}`,
-          type: 'memory',
-          level: 1,
-          size: `${8 + debugUpdateCounter}GB`
-        }
-      },
-      {
-        data: {
-          id: 'node3',
-          label: `Shader ${debugUpdateCounter}`,
-          type: 'shader',
-          level: 2,
-          active: debugUpdateCounter % 2 === 0
-        }
-      }
-    ];
-
-    // Add more nodes based on update counter
-    if (debugUpdateCounter > 2) {
-      baseNodes.push({
-        data: {
-          id: 'node4',
-          label: `Cache ${debugUpdateCounter}`,
-          type: 'cache',
-          level: 1,
-          hitRate: Math.random() * 100
-        }
-      });
-    }
-
-    return {
-      nodes: baseNodes,
-      edges: [] // TODO: Add edges later
-    };
-  };
-
-  // Initialize Cytoscape instance
-  useEffect(() => {
-    if (cyRef.current && !cyInstance.current) {
-      cyInstance.current = cytoscape({
-        container: cyRef.current,
-        style: cytoscapeStyles,
-        layout: cytoscapeLayout,
-        userZoomingEnabled: true,
-        userPanningEnabled: true,
-        boxSelectionEnabled: false,
-        autoungrabify: false,
-        autounselectify: false
-      });
-
-      cyInstance.current.on('tap', 'node', (event) => {
-        const node = event.target;
-        const nodeId = node.id();
-        const nodeData = node.data();
-        
-        selectNode(nodeId);
-        setSelectedNodeInfo(nodeData);
-      });
-
-      cyInstance.current.on('tap', (event) => {
-        if (event.target === cyInstance.current) {
-          selectNode(null);
-          setSelectedNodeInfo(null);
-        }
-      });
-
-      // Debug: Auto-update every 3 seconds
-      const debugInterval = setInterval(() => {
-        setDebugUpdateCounter(prev => prev + 1);
-        console.log('Debug: Triggering graph update', debugUpdateCounter + 1);
-      }, 3000);
-
-      // Cleanup
-      return () => {
-        clearInterval(debugInterval);
-        if (cyInstance.current) {
-          cyInstance.current.destroy();
-          cyInstance.current = null;
-        }
-      };
-    }
-  }, [selectNode]);
-
-  // Update graph when currentGraph changes OR debug counter changes
-  useEffect(() => {
-    if (cyInstance.current) {
-      try {
-        // Use debug data instead of currentGraph for now
-        const debugGraph = getDebugGraph();
-        console.log('GraphCanvas: Using debug graph:', debugGraph);
-        console.log('GraphCanvas: Debug update counter:', debugUpdateCounter);
-        
-        cyInstance.current.elements().remove();
-        const cytoscapeElements = convertGraphToCytoscape(debugGraph);
-        cyInstance.current.add(cytoscapeElements);
-        cyInstance.current.layout(cytoscapeLayout).run();
-        
-        console.log('Debug graph updated with elements:', cytoscapeElements.length);
-      } catch (err) {
-        console.error('Error updating debug graph:', err);
-      }
-    }
-  }, [currentGraph, debugUpdateCounter]); // Added debugUpdateCounter as dependency
-
-  // Update selection state
-  useEffect(() => {
-    if (cyInstance.current && selectedNode) {
-      cyInstance.current.nodes().unselect();
-      const node = cyInstance.current.getElementById(selectedNode);
-      if (node.length > 0) {
-        node.select();
-        setSelectedNodeInfo(node.data());
-      }
-    } else if (cyInstance.current && !selectedNode) {
-      cyInstance.current.nodes().unselect();
-      setSelectedNodeInfo(null);
-    }
-  }, [selectedNode]);
-
-  // Convert Graph interface to Cytoscape elements format
-  const convertGraphToCytoscape = (graph: Graph) => {
-    console.log('convertGraphToCytoscape: received graph =', graph);
-    const elements: any[] = [];
-
-    // Add nodes
-    if (graph.nodes) {
-      console.log('convertGraphToCytoscape: graph.nodes.length =', graph.nodes.length);
-      
-      graph.nodes.forEach((node, index) => {
-        console.log(`convertGraphToCytoscape: processing node ${index} =`, node);
-        elements.push({
-          data: {
-            ...node.data, // Include all node data (id, label, shape, type)
-          },
-          classes: node.data.type ? `node-${node.data.type}` : undefined
-        });
-      });
-    } else {
-      console.log('convertGraphToCytoscape: graph.nodes is undefined or null');
-    }
-    console.log('convertGraphToCytoscape: elements length =', elements.length);
-
-    // TODO: Add edges implementation
-    // if (graph.edges) {
-    //   graph.edges.forEach((edge) => {
-    //     elements.push({
-    //       data: {
-    //         id: edge.id || `${edge.source}-${edge.target}`,
-    //         source: edge.source,
-    //         target: edge.target,
-    //         label: edge.label,
-    //         ...edge.data,
-    //       },
-    //       classes: edge.type ? `edge-${edge.type}` : undefined
-    //     });
-    //   });
-    // }
-
-    return elements;
-  };
-
-  // Show debug info in UI
-  const debugGraph = getDebugGraph();
+/**
+ * GraphCanvas - Main React component that orchestrates everything
+ * Coordinates between GraphCore (rendering) and GraphEvents (interactions)
+ */
+const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const graphCoreRef = useRef<GraphCore | null>(null);
+  const graphEventsRef = useRef<GraphEvents | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [currentLayout, setCurrentLayout] = useState<LayoutType>('grid');
+  // Track if initialization has been successful
+  const [initSuccessful, setInitSuccessful] = useState(false);
   
+  // Get graph data from store
+  const { currentGraph, loading, error, selectNode } = useGpuStore();
+  
+  // Setup event handlers for graph interactions
+  const setupEventHandlers = useCallback(() => {
+    if (!graphEventsRef.current) return;
+    
+    // Handle node clicks
+    graphEventsRef.current.on('nodeClick', (nodeData: any) => {
+      console.log('GraphCanvas: Node clicked:', nodeData);
+      selectNode(nodeData.id);
+    });
+    
+    // Handle canvas clicks (deselect)
+    graphEventsRef.current.on('canvasClick', () => {
+      console.log('GraphCanvas: Canvas clicked');
+      selectNode(null);
+    });
+    
+    // Handle element selection
+    graphEventsRef.current.on('elementSelect', (elementData: any) => {
+      console.log('GraphCanvas: Element selected:', elementData);
+    });
+    
+    // Handle zoom changes
+    graphEventsRef.current.on('zoom', (zoomData: any) => {
+      console.log('GraphCanvas: Zoom changed:', zoomData.level);
+    });
+    
+    // Handle layout completion
+    graphEventsRef.current.on('layoutStop', () => {
+      console.log('GraphCanvas: Layout completed');
+    });
+  }, [selectNode]);
+  
+  // Initialize the graph core and events
+  useEffect(() => {
+    // Skip if already successfully initialized
+    if (initSuccessful) {
+      console.log('GraphCanvas: Already initialized, skipping');
+      return;
+    }
+    
+    // Check if container is ready
+    if (!containerRef.current) {
+      console.log('GraphCanvas: Container not ready yet, will retry on next render');
+      return;
+    }
+    
+    // Check if GraphCore already exists (double check)
+    if (graphCoreRef.current) {
+      console.log('GraphCanvas: GraphCore already exists, marking as initialized');
+      setInitSuccessful(true);
+      return;
+    }
+    
+    console.log('GraphCanvas: Starting initialization...');
+    
+    try {
+      // Initialize GraphCore
+      graphCoreRef.current = new GraphCore();
+      graphCoreRef.current.init(containerRef.current);
+      
+      // Initialize GraphEvents
+      const cytoscapeInstance = graphCoreRef.current.getCytoscapeInstance();
+      if (cytoscapeInstance) {
+        graphEventsRef.current = new GraphEvents();
+        graphEventsRef.current.setCytoscapeInstance(cytoscapeInstance);
+        
+        // Set up event handlers
+        setupEventHandlers();
+        
+        // Mark as successfully initialized
+        setInitSuccessful(true);
+        setIsReady(true);
+        console.log('GraphCanvas: Initialized successfully');
+      } else {
+        throw new Error('Failed to get Cytoscape instance');
+      }
+    } catch (error) {
+      console.error('GraphCanvas: Initialization error:', error);
+      // Clean up partial initialization
+      if (graphCoreRef.current) {
+        graphCoreRef.current.destroy();
+        graphCoreRef.current = null;
+      }
+      if (graphEventsRef.current) {
+        graphEventsRef.current.destroy();
+        graphEventsRef.current = null;
+      }
+      // Don't set initSuccessful to true, so it can retry
+    }
+  }); // This effect runs on every render, but exits early if already initialized
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      console.log('GraphCanvas: Cleaning up...');
+      if (graphEventsRef.current) {
+        graphEventsRef.current.destroy();
+        graphEventsRef.current = null;
+      }
+      if (graphCoreRef.current) {
+        graphCoreRef.current.destroy();
+        graphCoreRef.current = null;
+      }
+      setInitSuccessful(false);
+      setIsReady(false);
+    };
+  }, []);
+  
+  // Update graph when data changes
+  useEffect(() => {
+    if (graphCoreRef.current && isReady) {
+      console.log('📊 GraphCanvas: currentGraph changed, updating visualization...', currentGraph);
+      graphCoreRef.current.updateGraph(currentGraph);
+    }
+  }, [currentGraph, isReady]);
+  
+  // Handle layout changes
+  const handleLayoutChange = (layoutType: LayoutType) => {
+    if (graphCoreRef.current && isReady) {
+      setCurrentLayout(layoutType);
+      graphCoreRef.current.applyLayout(layoutType);
+    }
+  };
+  
+  // Expose control functions via ref
+  useImperativeHandle(ref, () => ({
+    fit: () => graphCoreRef.current?.fit(),
+    center: () => graphCoreRef.current?.center(),
+    reset: () => graphCoreRef.current?.reset(),
+    changeLayout: handleLayoutChange,
+    getState: () => graphCoreRef.current?.getState(),
+    selectElement: (id: string) => graphEventsRef.current?.selectElement(id),
+    unselectAll: () => graphEventsRef.current?.unselectAll()
+  }));
+  
+  // Render different states
   if (loading) {
     return (
       <div style={styles.container}>
@@ -207,68 +178,52 @@ export const GraphCanvas: React.FC = () => {
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div style={styles.container}>
         <div style={styles.errorContainer}>
-          <div style={styles.errorText}>
-            Error: {error}
-          </div>
+          <div style={styles.errorText}>Error: {error}</div>
         </div>
       </div>
     );
   }
-
-  return (
-    <div style={styles.container}>
-      {/* Debug info */}
-      <div style={{
-        position: 'absolute',
-        top: 10,
-        left: 10,
-        background: 'rgba(0,0,0,0.8)',
-        color: 'white',
-        padding: '10px',
-        borderRadius: '5px',
-        zIndex: 1000,
-        fontSize: '12px'
-      }}>
-        <div>Debug Mode: ON</div>
-        <div>Update #{debugUpdateCounter}</div>
-        <div>Nodes: {debugGraph.nodes.length}</div>
-      </div>
-
-      <div 
-        ref={cyRef} 
-        style={styles.graphContainer}
-      />
-      
-      {selectedNodeInfo && (
-        <div style={styles.nodeInfo}>
-          <div style={styles.nodeInfoTitle}>
-            Node: {selectedNodeInfo.label || selectedNodeInfo.id}
-          </div>
-          <div style={styles.nodeInfoContent}>
-            <div><strong>ID:</strong> {selectedNodeInfo.id}</div>
-            {selectedNodeInfo.type && (
-              <div><strong>Type:</strong> {selectedNodeInfo.type}</div>
-            )}
-            {selectedNodeInfo.level !== undefined && (
-              <div><strong>Level:</strong> {selectedNodeInfo.level}</div>
-            )}
-            {/* Display additional node data */}
-            {Object.entries(selectedNodeInfo)
-              .filter(([key]) => !['id', 'label', 'type', 'level'].includes(key))
-              .map(([key, value]) => (
-                <div key={key}>
-                  <strong>{key}:</strong> {String(value)}
-                </div>
-              ))
-            }
-          </div>
+  
+  if (!currentGraph || currentGraph.nodes.length === 0) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.emptyContainer}>
+          <div style={styles.emptyText}>No graph data available</div>
         </div>
-      )}
-    </div>
+      </div>
+    );
+  }
+  
+  return (
+    <ErrorBoundary fallbackUI={<button onClick={() => window.location.reload()}>Reload Page</button>}>
+      <div style={styles.container} data-testid="graph-canvas-container">
+        {/* Graph container */}
+        <div 
+          ref={containerRef} 
+          style={styles.graphContainer}
+        />
+        
+        {/* Debug info (can be removed in production) */}
+        {isReady && (
+          <div style={styles.nodeInfo}>
+            <div style={styles.nodeInfoTitle}>Graph Info</div>
+            <div style={styles.nodeInfoContent}>
+              Layout: {currentLayout}<br/>
+              Nodes: {currentGraph.nodes.length}<br/>
+              Edges: {currentGraph.edges.length}<br/>
+              Status: {isReady ? 'Ready' : 'Not Ready'}<br/>
+              Init: {initSuccessful ? 'Success' : 'Pending'}
+            </div>
+          </div>
+        )}
+      </div>
+    </ErrorBoundary>
   );
 };
+
+export default forwardRef(GraphCanvas);

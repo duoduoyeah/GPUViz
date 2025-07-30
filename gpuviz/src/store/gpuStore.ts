@@ -70,12 +70,7 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
       
       // 3. Create initial graph at default level
       const currentGraph = componentGraph.createGraphAtLevel(get().activeLevel);
-      console.log('Current graph at level 1:', currentGraph); 
-      console.log('Graph nodes count:', currentGraph?.nodes?.length); 
-      console.log('Graph edges count:', currentGraph?.edges?.length); 
-      
-      // Add logging when currentGraph is updated
-      console.log('🔄 currentGraph updated in loadData:', currentGraph);
+
       
       // Update store with processed data
       set({
