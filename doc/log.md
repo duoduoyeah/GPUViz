@@ -6,6 +6,21 @@
 * user input -> panel side logic -> modify the data -> give to cytoscape to update the graph
 
 ---
+---
+8.1
+Goal: start connect stuff, made it readable(adjust the UI part)
+
+gpuStore side, set the edge.
+
+---
+07.31
+Goal: 
+Debug: after an invalid level, the graph side error even the level is validated back. [Done]
+
+---
+07.30
+Goal: graphcanvas side done, many bugs.
+---
 07.26
 Goal: Step by step write a readable GraphCanvas.tsx
 

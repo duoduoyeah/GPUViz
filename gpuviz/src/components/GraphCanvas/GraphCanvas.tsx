@@ -1,10 +1,17 @@
-import React, { useEffect, useRef, useState, forwardRef, useImperativeHandle, useCallback } from 'react';
-import useGpuStore from '../../store/gpuStore';
-import { GraphCore } from './GraphCore';
-import { GraphEvents } from './GraphEvents';
-import { styles } from './GraphCanvas.styles';
-import type { LayoutType } from './GraphConfig';
-import ErrorBoundary from './ErrorBoundary';
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from "react";
+import useGpuStore from "../../store/gpuStore";
+import { GraphCore } from "./GraphCore";
+import { GraphEvents } from "./GraphEvents";
+import { styles } from "./GraphCanvas.styles";
+import type { LayoutType } from "./GraphConfig";
+import ErrorBoundary from "./ErrorBoundary";
 
 export interface GraphCanvasHandles {
   fit: () => void;
@@ -20,96 +27,99 @@ export interface GraphCanvasHandles {
  * GraphCanvas - Main React component that orchestrates everything
  * Coordinates between GraphCore (rendering) and GraphEvents (interactions)
  */
-const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props, ref) => {
+const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
+  _props,
+  ref,
+) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const graphCoreRef = useRef<GraphCore | null>(null);
   const graphEventsRef = useRef<GraphEvents | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [currentLayout, setCurrentLayout] = useState<LayoutType>('grid');
+  const [currentLayout, setCurrentLayout] = useState<LayoutType>("grid");
+
+
   // Track if initialization has been successful
   const [initSuccessful, setInitSuccessful] = useState(false);
-  
+
   // Get graph data from store
   const { currentGraph, loading, error, selectNode } = useGpuStore();
-  
+
   // Setup event handlers for graph interactions
   const setupEventHandlers = useCallback(() => {
     if (!graphEventsRef.current) return;
-    
+
     // Handle node clicks
-    graphEventsRef.current.on('nodeClick', (nodeData: any) => {
-      console.log('GraphCanvas: Node clicked:', nodeData);
+    graphEventsRef.current.on("nodeClick", (nodeData: any) => {
+      console.log("GraphCanvas: Node clicked:", nodeData);
       selectNode(nodeData.id);
     });
-    
+
     // Handle canvas clicks (deselect)
-    graphEventsRef.current.on('canvasClick', () => {
-      console.log('GraphCanvas: Canvas clicked');
+    graphEventsRef.current.on("canvasClick", () => {
+      console.log("GraphCanvas: Canvas clicked");
       selectNode(null);
     });
-    
+
     // Handle element selection
-    graphEventsRef.current.on('elementSelect', (elementData: any) => {
-      console.log('GraphCanvas: Element selected:', elementData);
+    graphEventsRef.current.on("elementSelect", (elementData: any) => {
+      console.log("GraphCanvas: Element selected:", elementData);
     });
-    
+
     // Handle zoom changes
-    graphEventsRef.current.on('zoom', (zoomData: any) => {
-      console.log('GraphCanvas: Zoom changed:', zoomData.level);
+    graphEventsRef.current.on("zoom", (zoomData: any) => {
+      console.log("GraphCanvas: Zoom changed:", zoomData.level);
     });
-    
+
     // Handle layout completion
-    graphEventsRef.current.on('layoutStop', () => {
-      console.log('GraphCanvas: Layout completed');
+    graphEventsRef.current.on("layoutStop", () => {
+      console.log("GraphCanvas: Layout completed");
     });
   }, [selectNode]);
-  
+
   // Initialize the graph core and events
   useEffect(() => {
     // Skip if already successfully initialized
     if (initSuccessful) {
-      console.log('GraphCanvas: Already initialized, skipping');
+      console.log("GraphCanvas: Already initialized, skipping");
       return;
     }
-    
+
     // Check if container is ready
     if (!containerRef.current) {
-      console.log('GraphCanvas: Container not ready yet, will retry on next render');
       return;
     }
-    
+
     // Check if GraphCore already exists (double check)
     if (graphCoreRef.current) {
-      console.log('GraphCanvas: GraphCore already exists, marking as initialized');
       setInitSuccessful(true);
       return;
     }
-    
-    console.log('GraphCanvas: Starting initialization...');
-    
+
+    console.log("GraphCanvas: Starting initialization...");
+
     try {
       // Initialize GraphCore
       graphCoreRef.current = new GraphCore();
       graphCoreRef.current.init(containerRef.current);
-      
+
       // Initialize GraphEvents
       const cytoscapeInstance = graphCoreRef.current.getCytoscapeInstance();
       if (cytoscapeInstance) {
         graphEventsRef.current = new GraphEvents();
         graphEventsRef.current.setCytoscapeInstance(cytoscapeInstance);
-        
+
         // Set up event handlers
         setupEventHandlers();
-        
+
         // Mark as successfully initialized
         setInitSuccessful(true);
         setIsReady(true);
-        console.log('GraphCanvas: Initialized successfully');
+        console.log("GraphCanvas: Initialized successfully");
       } else {
-        throw new Error('Failed to get Cytoscape instance');
+        throw new Error("Failed to get Cytoscape instance");
       }
     } catch (error) {
-      console.error('GraphCanvas: Initialization error:', error);
+      console.error("GraphCanvas: Initialization error:", error);
       // Clean up partial initialization
       if (graphCoreRef.current) {
         graphCoreRef.current.destroy();
@@ -122,11 +132,11 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
       // Don't set initSuccessful to true, so it can retry
     }
   }); // This effect runs on every render, but exits early if already initialized
-  
+
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      console.log('GraphCanvas: Cleaning up...');
+      console.log("GraphCanvas: Cleaning up...");
       if (graphEventsRef.current) {
         graphEventsRef.current.destroy();
         graphEventsRef.current = null;
@@ -135,19 +145,29 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
         graphCoreRef.current.destroy();
         graphCoreRef.current = null;
       }
-      setInitSuccessful(false);
-      setIsReady(false);
     };
   }, []);
-  
+
+  // Handle errors from the store
+  useEffect(() => {
+    if (error) {
+      console.error('Graph Error:', error);
+    }
+  }, [error]);
+
   // Update graph when data changes
   useEffect(() => {
     if (graphCoreRef.current && isReady) {
-      console.log('📊 GraphCanvas: currentGraph changed, updating visualization...', currentGraph);
+      console.log(
+        "📊 GraphCanvas: currentGraph changed, updating visualization...",
+        currentGraph,
+      );
       graphCoreRef.current.updateGraph(currentGraph);
     }
   }, [currentGraph, isReady]);
-  
+
+
+
   // Handle layout changes
   const handleLayoutChange = (layoutType: LayoutType) => {
     if (graphCoreRef.current && isReady) {
@@ -155,7 +175,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
       graphCoreRef.current.applyLayout(layoutType);
     }
   };
-  
+
   // Expose control functions via ref
   useImperativeHandle(ref, () => ({
     fit: () => graphCoreRef.current?.fit(),
@@ -164,9 +184,9 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
     changeLayout: handleLayoutChange,
     getState: () => graphCoreRef.current?.getState(),
     selectElement: (id: string) => graphEventsRef.current?.selectElement(id),
-    unselectAll: () => graphEventsRef.current?.unselectAll()
+    unselectAll: () => graphEventsRef.current?.unselectAll(),
   }));
-  
+
   // Render different states
   if (loading) {
     return (
@@ -178,17 +198,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
       </div>
     );
   }
-  
-  if (error) {
-    return (
-      <div style={styles.container}>
-        <div style={styles.errorContainer}>
-          <div style={styles.errorText}>Error: {error}</div>
-        </div>
-      </div>
-    );
-  }
-  
+
   if (!currentGraph || currentGraph.nodes.length === 0) {
     return (
       <div style={styles.container}>
@@ -198,26 +208,49 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (_props,
       </div>
     );
   }
-  
+
   return (
-    <ErrorBoundary fallbackUI={<button onClick={() => window.location.reload()}>Reload Page</button>}>
+    <ErrorBoundary
+      fallbackUI={
+        <button onClick={() => window.location.reload()}>Reload Page</button>
+      }
+    >
       <div style={styles.container} data-testid="graph-canvas-container">
         {/* Graph container */}
-        <div 
-          ref={containerRef} 
-          style={styles.graphContainer}
-        />
-        
+        <div ref={containerRef} style={styles.graphContainer} />
+
+        {/* Error notification */}
+        {error && (
+          <div style={styles.errorNotification}>
+            <div style={styles.errorNotificationTitle}>
+              Error
+            </div>
+            <div style={styles.errorNotificationMessage}>
+              {error}
+            </div>
+          </div>
+        )}
+
         {/* Debug info (can be removed in production) */}
         {isReady && (
           <div style={styles.nodeInfo}>
             <div style={styles.nodeInfoTitle}>Graph Info</div>
             <div style={styles.nodeInfoContent}>
-              Layout: {currentLayout}<br/>
-              Nodes: {currentGraph.nodes.length}<br/>
-              Edges: {currentGraph.edges.length}<br/>
-              Status: {isReady ? 'Ready' : 'Not Ready'}<br/>
-              Init: {initSuccessful ? 'Success' : 'Pending'}
+              Layout: {currentLayout}
+              <br />
+              Nodes: {currentGraph.nodes.length}
+              <br />
+              Edges: {currentGraph.edges.length}
+              <br />
+              Status: {isReady ? "Ready" : "Not Ready"}
+              <br />
+              Init: {initSuccessful ? "Success" : "Pending"}
+              {error && (
+                <>
+                  <br />
+                  Error: Present
+                </>
+              )}
             </div>
           </div>
         )}

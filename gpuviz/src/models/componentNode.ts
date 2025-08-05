@@ -1,82 +1,84 @@
-
-import type { ComponentNode, Port, NodeInfo, ComponentKind} from '../types/index'; 
+import type {
+  ComponentNode,
+  Port,
+  NodeInfo,
+  ComponentKind,
+} from "../types/index";
 
 // Create a class that implements the ComponentNode interface
 export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
-    name: string;
-    info!: T;
+  name: string;
+  info!: T;
 
-    ports: Port[] = [];
-    portNum: number = 0;
+  ports: Port[] = [];
+  portNum: number = 0;
 
-    type: string = "";
-    shape: ComponentKind;
+  type: string = "";
+  shape: ComponentKind;
 
-    parent: ComponentNode<T> | undefined;
-    children: ComponentNode<T>[] = [];
+  parent: ComponentNode<T> | undefined;
+  children: ComponentNode<T>[] = [];
 
+  constructor(name: string) {
+    this.name = name;
+  }
 
-    constructor(name: string) {
-        this.name = name;
-    }
+  setType(type: string): void {
+    this.type = type;
+  }
 
-    setType(type: string): void {
-        this.type = type;
-    }
+  setInfo(info: T): void {
+    this.info = info;
+  }
 
-    setInfo(info: T): void {
-        this.info = info;
-    }
+  setPorts(ports: Port[]): void {
+    this.ports = ports;
+    this.portNum = this.ports.length;
+  }
 
-    setPorts(ports: Port[]): void {
-        this.ports = ports;
-        this.portNum = this.ports.length
-    }
+  setShape(): void {
+    this.shape = "square";
+  }
 
-    setShape(): void {
-        this.shape = 'square'
-    }
+  public setParent(parent: ComponentNode<T>): void {
+    this.parent = parent;
+  }
 
-    public setParent(parent: ComponentNode<T>): void {
-        this.parent = parent;
-    }
+  setChildren(children: ComponentNode<T>[]): void {
+    this.children = children;
+  }
 
-    setChildren(children: ComponentNode<T>[]): void {
-        this.children = children;
-    }
+  getName(): string {
+    return this.name;
+  }
 
+  getInfo(): T {
+    return this.info;
+  }
 
-    getName(): string {
-        return this.name;
-    }
+  getPorts(): Port[] {
+    return this.ports;
+  }
 
-    getInfo(): T {
-        return this.info;
-    }
+  getPortNum(): number {
+    return this.portNum;
+  }
 
-    getPorts(): Port[] {
-        return this.ports;
-    }
+  getParent(): ComponentNode<T> | undefined {
+    return this.parent;
+  }
 
-    getPortNum(): number {
-        return this.portNum
-    }
+  getChildren(): ComponentNode<T>[] {
+    return this.children;
+  }
 
-    getParent(): ComponentNode<T> | undefined {
-        return this.parent;
-    }
+  // Method to add a child node
+  addChild(child: ComponentNode<T>): void {
+    this.children.push(child);
+  }
 
-    getChildren(): ComponentNode<T>[] {
-        return this.children;
-    }
-
-    // Method to add a child node
-    addChild(child: ComponentNode<T>): void {
-        this.children.push(child);
-    }
-
-    // Method to add a port
-    addPort(port: Port): void {
-        this.ports.push(port);
-    }
+  // Method to add a port
+  addPort(port: Port): void {
+    this.ports.push(port);
+  }
 }

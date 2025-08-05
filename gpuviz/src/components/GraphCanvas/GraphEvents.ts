@@ -1,4 +1,4 @@
-import cytoscape from 'cytoscape';
+import cytoscape from "cytoscape";
 
 /**
  * GraphEvents handles user interactions, Cytoscape event bridging, and gesture handling
@@ -48,7 +48,7 @@ export class GraphEvents {
    */
   emit(eventName: string, data?: any): void {
     if (!this.isEnabled) return;
-    
+
     const handler = this.eventHandlers.get(eventName);
     if (handler) {
       try {
@@ -66,128 +66,128 @@ export class GraphEvents {
     if (!this.cytoscapeInstance) return;
 
     // Node events
-    this.cytoscapeInstance.on('tap', 'node', (event) => {
+    this.cytoscapeInstance.on("tap", "node", (event) => {
       if (!this.isEnabled) return;
-      
+
       const node = event.target;
       const nodeData = {
         id: node.id(),
         data: node.data(),
-        position: node.position()
+        position: node.position(),
       };
-      
-      console.log('GraphEvents: Node tapped:', nodeData);
-      this.emit('nodeClick', nodeData);
+
+      console.log("GraphEvents: Node tapped:", nodeData);
+      this.emit("nodeClick", nodeData);
     });
 
-    this.cytoscapeInstance.on('mouseover', 'node', (event) => {
+    this.cytoscapeInstance.on("mouseover", "node", (event) => {
       if (!this.isEnabled) return;
-      
+
       const node = event.target;
       const nodeData = {
         id: node.id(),
         data: node.data(),
-        position: node.position()
+        position: node.position(),
       };
-      
-      this.emit('nodeHover', nodeData);
+
+      this.emit("nodeHover", nodeData);
     });
 
-    this.cytoscapeInstance.on('mouseout', 'node', (event) => {
+    this.cytoscapeInstance.on("mouseout", "node", (event) => {
       if (!this.isEnabled) return;
-      
+
       const node = event.target;
       const nodeData = {
         id: node.id(),
-        data: node.data()
+        data: node.data(),
       };
-      
-      this.emit('nodeUnhover', nodeData);
+
+      this.emit("nodeUnhover", nodeData);
     });
 
     // Edge events
-    this.cytoscapeInstance.on('tap', 'edge', (event) => {
+    this.cytoscapeInstance.on("tap", "edge", (event) => {
       if (!this.isEnabled) return;
-      
+
       const edge = event.target;
       const edgeData = {
         id: edge.id(),
         data: edge.data(),
         source: edge.source().id(),
-        target: edge.target().id()
+        target: edge.target().id(),
       };
-      
-      console.log('GraphEvents: Edge tapped:', edgeData);
-      this.emit('edgeClick', edgeData);
+
+      console.log("GraphEvents: Edge tapped:", edgeData);
+      this.emit("edgeClick", edgeData);
     });
 
     // Canvas events
-    this.cytoscapeInstance.on('tap', (event) => {
+    this.cytoscapeInstance.on("tap", (event) => {
       if (!this.isEnabled) return;
-      
+
       // Only trigger if clicking on canvas (not node/edge)
       if (event.target === this.cytoscapeInstance) {
-        console.log('GraphEvents: Canvas tapped');
-        this.emit('canvasClick', event);
+        console.log("GraphEvents: Canvas tapped");
+        this.emit("canvasClick", event);
       }
     });
 
     // Selection events
-    this.cytoscapeInstance.on('select', (event) => {
+    this.cytoscapeInstance.on("select", (event) => {
       if (!this.isEnabled) return;
-      
+
       const element = event.target;
       const elementData = {
         id: element.id(),
         data: element.data(),
-        type: element.isNode() ? 'node' : 'edge'
+        type: element.isNode() ? "node" : "edge",
       };
-      
-      console.log('GraphEvents: Element selected:', elementData);
-      this.emit('elementSelect', elementData);
+
+      console.log("GraphEvents: Element selected:", elementData);
+      this.emit("elementSelect", elementData);
     });
 
-    this.cytoscapeInstance.on('unselect', (event) => {
+    this.cytoscapeInstance.on("unselect", (event) => {
       if (!this.isEnabled) return;
-      
+
       const element = event.target;
       const elementData = {
         id: element.id(),
         data: element.data(),
-        type: element.isNode() ? 'node' : 'edge'
+        type: element.isNode() ? "node" : "edge",
       };
-      
-      console.log('GraphEvents: Element unselected:', elementData);
-      this.emit('elementUnselect', elementData);
+
+      console.log("GraphEvents: Element unselected:", elementData);
+      this.emit("elementUnselect", elementData);
     });
 
     // Zoom and pan events
-    this.cytoscapeInstance.on('zoom', (event) => {
+    this.cytoscapeInstance.on("zoom", (event) => {
       if (!this.isEnabled) return;
-      
+
       const zoomLevel = this.cytoscapeInstance?.zoom() || 1;
-      this.emit('zoom', { level: zoomLevel, event });
+      this.emit("zoom", { level: zoomLevel, event });
     });
 
-    this.cytoscapeInstance.on('pan', (event) => {
+    this.cytoscapeInstance.on("pan", (event) => {
       if (!this.isEnabled) return;
-      
+
       const pan = this.cytoscapeInstance?.pan() || { x: 0, y: 0 };
-      this.emit('pan', { position: pan, event });
+      this.emit("pan", { position: pan, event });
     });
 
     // Layout events
-    this.cytoscapeInstance.on('layoutstart', (event) => {
-      console.log('GraphEvents: Layout started');
-      this.emit('layoutStart', event);
+    this.cytoscapeInstance.on("layoutstart", (event) => {
+      console.log("GraphEvents: Layout started");
+      this.emit("layoutStart", event);
     });
 
-    this.cytoscapeInstance.on('layoutstop', (event) => {
-      console.log('GraphEvents: Layout completed');
-      this.emit('layoutStop', event);
+    this.cytoscapeInstance.on("layoutstop", (event) => {
+      console.log("GraphEvents: Layout completed");
+      this.emit("layoutStop", event);
     });
 
-    console.log('GraphEvents: Cytoscape events bound successfully');
+    console.log("GraphEvents: Cytoscape events bound successfully");
   }
 
   /**
@@ -196,7 +196,7 @@ export class GraphEvents {
   unbindCytoscapeEvents(): void {
     if (this.cytoscapeInstance) {
       this.cytoscapeInstance.removeAllListeners();
-      console.log('GraphEvents: Cytoscape events unbound');
+      console.log("GraphEvents: Cytoscape events unbound");
     }
   }
 
@@ -205,11 +205,11 @@ export class GraphEvents {
    */
   getSelectedElements(): any[] {
     if (!this.cytoscapeInstance) return [];
-    
-    return this.cytoscapeInstance.elements(':selected').map(element => ({
+
+    return this.cytoscapeInstance.elements(":selected").map((element) => ({
       id: element.id(),
       data: element.data(),
-      type: element.isNode() ? 'node' : 'edge'
+      type: element.isNode() ? "node" : "edge",
     }));
   }
 
@@ -218,7 +218,7 @@ export class GraphEvents {
    */
   selectElement(elementId: string): void {
     if (!this.cytoscapeInstance) return;
-    
+
     const element = this.cytoscapeInstance.getElementById(elementId);
     if (element.length > 0) {
       element.select();
@@ -230,7 +230,7 @@ export class GraphEvents {
    */
   unselectAll(): void {
     if (!this.cytoscapeInstance) return;
-    
+
     this.cytoscapeInstance.elements().unselect();
   }
 
@@ -241,6 +241,6 @@ export class GraphEvents {
     this.unbindCytoscapeEvents();
     this.eventHandlers.clear();
     this.cytoscapeInstance = null;
-    console.log('GraphEvents: Destroyed');
+    console.log("GraphEvents: Destroyed");
   }
 }

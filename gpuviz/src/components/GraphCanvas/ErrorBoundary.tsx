@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import type { ReactNode } from 'react';
+import React, { Component } from "react";
+import type { ReactNode } from "react";
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -29,7 +29,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log the error to an external service or console
-    console.error('Error caught by Error Boundary:', error, errorInfo);
+    console.error("Error caught by Error Boundary:", error, errorInfo);
     this.setState({
       error,
       errorInfo,
@@ -40,10 +40,16 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     if (this.state.hasError) {
       // Render the fallback UI if an error occurred
       return (
-        <div style={{ padding: '20px', backgroundColor: '#f8d7da', color: '#721c24' }}>
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: "#f8d7da",
+            color: "#721c24",
+          }}
+        >
           <h2>Something went wrong!</h2>
-          <p>{this.state.error?.message || 'An unexpected error occurred.'}</p>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <p>{this.state.error?.message || "An unexpected error occurred."}</p>
+          <details style={{ whiteSpace: "pre-wrap" }}>
             {this.state.errorInfo?.componentStack}
           </details>
           {this.props.fallbackUI}

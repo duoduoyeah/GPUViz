@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import type { RefObject } from 'react';
-import { styles } from './ConfigPanel.styles';
-import type { GraphCanvasHandles } from '../GraphCanvas/GraphCanvas';
+import React, { useState } from "react";
+import type { RefObject } from "react";
+import { styles } from "./ConfigPanel.styles";
+import type { GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
 
 interface ConfigPanelProps {
   onSubmit: (config: {
     level: number;
-    filter: 'all' | 'memory' | 'compute';
+    filter: "all" | "memory" | "compute";
     selectedItems: string[];
   }) => void;
   graphCanvasRef: RefObject<GraphCanvasHandles | null>;
@@ -14,30 +14,31 @@ interface ConfigPanelProps {
 
 // Mock data - replace with actual data source
 const mockItems = {
-  all: ['item-A', 'item-B', 'item-C', 'item-D'],
-  memory: ['mem-1', 'mem-2', 'mem-3'],
-  compute: ['comp-1', 'comp-2', 'comp-3']
+  all: ["item-A", "item-B", "item-C", "item-D"],
+  memory: ["mem-1", "mem-2", "mem-3"],
+  compute: ["comp-1", "comp-2", "comp-3"],
 };
 
-export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasRef }) => {
+export const ConfigPanel: React.FC<ConfigPanelProps> = ({
+  onSubmit,
+  graphCanvasRef,
+}) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [level, setLevel] = useState<number | ''>('');
-  const [filter, setFilter] = useState<'all' | 'memory' | 'compute'>('all');
+  const [level, setLevel] = useState<number | "">("");
+  const [filter, setFilter] = useState<"all" | "memory" | "compute">("all");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleItemToggle = (item: string) => {
-    setSelectedItems(prev =>
-      prev.includes(item)
-        ? prev.filter(i => i !== item)
-        : [...prev, item]
+    setSelectedItems((prev) =>
+      prev.includes(item) ? prev.filter((i) => i !== item) : [...prev, item],
     );
   };
 
   const handleSubmit = () => {
-    onSubmit({ 
-      level: typeof level === 'number' ? level : 0, 
-      filter, 
-      selectedItems 
+    onSubmit({
+      level: typeof level === "number" ? level : 0,
+      filter,
+      selectedItems,
     });
   };
 
@@ -54,7 +55,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
   if (isCollapsed) {
     return (
       <div style={styles.collapsedContainer}>
-        <button 
+        <button
           onClick={() => setIsCollapsed(false)}
           style={styles.chevronButton}
         >
@@ -68,7 +69,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
     <div style={styles.mainContainer}>
       {/* Header */}
       <div style={styles.header}>
-        <button 
+        <button
           onClick={() => setIsCollapsed(true)}
           style={styles.chevronButton}
         >
@@ -80,13 +81,13 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
       {/* Level selector */}
       <div style={styles.section}>
         <label>
-          Level: 
+          Level:
           <input
             type="number"
             value={level}
             onChange={(e) => {
               const value = e.target.value;
-              setLevel(value === '' ? '' : Number(value));
+              setLevel(value === "" ? "" : Number(value));
             }}
             min={0}
             style={styles.levelInput}
@@ -100,20 +101,20 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
         <div>Show:</div>
         <div style={styles.filterButtonGroup}>
           <button
-            onClick={() => setFilter('all')}
-            style={styles.filterButton(filter === 'all')}
+            onClick={() => setFilter("all")}
+            style={styles.filterButton(filter === "all")}
           >
             All
           </button>
           <button
-            onClick={() => setFilter('memory')}
-            style={styles.filterButton(filter === 'memory')}
+            onClick={() => setFilter("memory")}
+            style={styles.filterButton(filter === "memory")}
           >
             Memory
           </button>
           <button
-            onClick={() => setFilter('compute')}
-            style={styles.filterButton(filter === 'compute')}
+            onClick={() => setFilter("compute")}
+            style={styles.filterButton(filter === "compute")}
           >
             Compute
           </button>
@@ -122,11 +123,8 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
 
       {/* Item list */}
       <div style={styles.itemList}>
-        {getFilteredItems().map(item => (
-          <label
-            key={item}
-            style={styles.itemLabel}
-          >
+        {getFilteredItems().map((item) => (
+          <label key={item} style={styles.itemLabel}>
             <input
               type="checkbox"
               checked={selectedItems.includes(item)}
@@ -140,10 +138,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
 
       {/* Submit button */}
       <div style={styles.submitSection}>
-        <button
-          onClick={handleSubmit}
-          style={styles.submitButton}
-        >
+        <button onClick={handleSubmit} style={styles.submitButton}>
           Update Graph
         </button>
       </div>
@@ -152,9 +147,15 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ onSubmit, graphCanvasR
       <div style={styles.section}>
         <div>Graph Controls:</div>
         <div style={styles.filterButtonGroup}>
-          <button onClick={handleFit} style={styles.filterButton(false)}>Fit</button>
-          <button onClick={handleCenter} style={styles.filterButton(false)}>Center</button>
-          <button onClick={handleReset} style={styles.filterButton(false)}>Reset</button>
+          <button onClick={handleFit} style={styles.filterButton(false)}>
+            Fit
+          </button>
+          <button onClick={handleCenter} style={styles.filterButton(false)}>
+            Center
+          </button>
+          <button onClick={handleReset} style={styles.filterButton(false)}>
+            Reset
+          </button>
         </div>
       </div>
     </div>

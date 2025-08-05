@@ -1,6 +1,6 @@
 // src/components/Layout/AppLayout.tsx
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -23,7 +23,10 @@ interface AppLayoutProps {
   rightPanel: React.ReactNode;
 }
 
-export const AppLayout: React.FC<AppLayoutProps> = ({ leftPanel, rightPanel }) => {
+export const AppLayout: React.FC<AppLayoutProps> = ({
+  leftPanel,
+  rightPanel,
+}) => {
   return (
     <LayoutContainer>
       <LeftPanel>{leftPanel}</LeftPanel>

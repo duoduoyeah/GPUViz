@@ -17,7 +17,6 @@ export interface GraphEdge {
   };
 }
 
-
 export interface Graph {
   nodes: GraphNode[];
   edges: GraphEdge[];
