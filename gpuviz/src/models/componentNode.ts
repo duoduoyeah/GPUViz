@@ -6,9 +6,9 @@ import type {
 } from "../types/index";
 
 // Create a class that implements the ComponentNode interface
-export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
+export class ComponentNodeImpl implements ComponentNode {
   name: string;
-  info!: T;
+  info!: NodeInfo;
 
   ports: Port[] = [];
   portNum: number = 0;
@@ -16,8 +16,8 @@ export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
   type: string = "";
   shape: ComponentKind;
 
-  parent: ComponentNode<T> | undefined;
-  children: ComponentNode<T>[] = [];
+  parent: ComponentNode | undefined;
+  children: ComponentNode[] = [];
 
   constructor(name: string) {
     this.name = name;
@@ -27,7 +27,7 @@ export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
     this.type = type;
   }
 
-  setInfo(info: T): void {
+  setInfo(info: NodeInfo): void {
     this.info = info;
   }
 
@@ -40,11 +40,11 @@ export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
     this.shape = "square";
   }
 
-  public setParent(parent: ComponentNode<T>): void {
+  public setParent(parent: ComponentNode): void {
     this.parent = parent;
   }
 
-  setChildren(children: ComponentNode<T>[]): void {
+  setChildren(children: ComponentNode[]): void {
     this.children = children;
   }
 
@@ -52,7 +52,7 @@ export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
     return this.name;
   }
 
-  getInfo(): T {
+  getInfo(): NodeInfo {
     return this.info;
   }
 
@@ -64,21 +64,33 @@ export class ComponentNodeImpl<T extends NodeInfo> implements ComponentNode<T> {
     return this.portNum;
   }
 
-  getParent(): ComponentNode<T> | undefined {
+  getParent(): ComponentNode | undefined {
     return this.parent;
   }
 
-  getChildren(): ComponentNode<T>[] {
+  getChildren(): ComponentNode[] {
     return this.children;
   }
 
   // Method to add a child node
-  addChild(child: ComponentNode<T>): void {
+  addChild(child: ComponentNode): void {
     this.children.push(child);
   }
 
   // Method to add a port
   addPort(port: Port): void {
     this.ports.push(port);
+  }
+
+  isAncestor(node: ComponentNode): boolean {
+    if (!this.parent) {
+      return false;
+    }
+    
+    if (this.parent === node) {
+      return true;
+    }
+    
+    return this.parent.isAncestor(node);
   }
 }

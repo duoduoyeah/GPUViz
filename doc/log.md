@@ -1,11 +1,25 @@
 [Pin]
-* Goal: show the graph
 * Goal: Tree Structure → Graph Structure at Specific Level (Cytoscape-ready graph data)
 * Check Hooks for Components and Buffer of Port
 * we run a larger workload to get another connections
 * user input -> panel side logic -> modify the data -> give to cytoscape to update the graph
 
 ---
+8.6
+Goal: when slick one component, show this component 
+
+---
+8.5
+Goal: design the data strucutre follow cytoscape.
+We will add to graph: the parent relationship and the connection. [Done]
+
+We need to modify the Level stuff: original, absolute level 1, level 2, level 3. New: give a list to let the user choose the
+desired component level.
+
+When double click one component: show all the sub-component in 
+this component, show all the connections. we should have a method
+like: get the mem routine, or something like this(later)
+
 ---
 8.1
 Goal: start connect stuff, made it readable(adjust the UI part)

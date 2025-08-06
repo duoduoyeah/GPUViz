@@ -75,9 +75,21 @@ export class GraphEvents {
         data: node.data(),
         position: node.position(),
       };
-
-      console.log("GraphEvents: Node tapped:", nodeData);
       this.emit("nodeClick", nodeData);
+    });
+    
+    // Node double click event
+    this.cytoscapeInstance.on("dbltap", "node", (event) => {
+      if (!this.isEnabled) return;
+
+      const node = event.target;
+      const nodeData = {
+        id: node.id(),
+        data: node.data(),
+        position: node.position(),
+      };
+
+      this.emit("nodeDoubleClick", nodeData);
     });
 
     this.cytoscapeInstance.on("mouseover", "node", (event) => {
@@ -143,7 +155,8 @@ export class GraphEvents {
         type: element.isNode() ? "node" : "edge",
       };
 
-      console.log("GraphEvents: Element selected:", elementData);
+      // 08-05-25 comment out since this log is unnecessary
+      // console.log("GraphEvents: Element selected:", elementData);
       this.emit("elementSelect", elementData);
     });
 

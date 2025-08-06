@@ -41,10 +41,11 @@ export class GraphCore {
 
     this.cy.add(elements);
 
-    // Force a batch update
-    this.cy.batch(() => {
-      this.cy!.add(elements);
-    });
+    // Commented out on 2025-08-05 — remove later if no issues arise.
+    // this.cy.batch(() => {
+    //   this.cy!.add(elements);
+    // });
+    // ==========================================================
 
     this.applyLayout(this.layout);
   }

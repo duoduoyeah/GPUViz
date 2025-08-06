@@ -1,16 +1,16 @@
-import type { ComponentNode, NodeInfo } from "./component";
+import type { ComponentNode } from "./component";
 
-export interface Tree<T extends NodeInfo> {
-  root: ComponentNode<T>;
+export interface Tree {
+  root: ComponentNode;
   depth: number;
-  levelMap: Map<number, ComponentNode<T>[]>;
+  levelMap: Map<number, ComponentNode[]>;
 
   // Node ops
   findNode(
-    predicate: (node: ComponentNode<T>) => boolean,
-  ): ComponentNode<T> | null;
-  findNodeByName(name: string): ComponentNode<T> | null;
-  getNodesAtLevel(level: number): ComponentNode<T>[];
+    predicate: (node: ComponentNode) => boolean,
+  ): ComponentNode | null;
+  findNodeByName(name: string): ComponentNode | null;
+  getNodesAtLevel(level: number): ComponentNode[];
 
   //tree ops
   getDepth(): number;

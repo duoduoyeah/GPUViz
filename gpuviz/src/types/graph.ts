@@ -2,16 +2,17 @@ import type { ComponentKind } from "./component";
 
 export interface GraphNode {
   data: {
-    id: string;
+    readonly id: string;
     label: string;
     shape: ComponentKind;
     type: string;
+    parent?: string;
   };
 }
 
 export interface GraphEdge {
   data: {
-    id: string;
+    readonly id: string;
     source: string;
     target: string;
   };

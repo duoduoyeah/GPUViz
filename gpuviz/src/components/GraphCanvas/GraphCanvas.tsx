@@ -42,7 +42,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
   const [initSuccessful, setInitSuccessful] = useState(false);
 
   // Get graph data from store
-  const { currentGraph, loading, error, selectNode } = useGpuStore();
+  const { currentGraph, loading, error, selectNode, selectComponent } = useGpuStore();
 
   // Setup event handlers for graph interactions
   const setupEventHandlers = useCallback(() => {
@@ -50,7 +50,6 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
 
     // Handle node clicks
     graphEventsRef.current.on("nodeClick", (nodeData: any) => {
-      console.log("GraphCanvas: Node clicked:", nodeData);
       selectNode(nodeData.id);
     });
 
@@ -74,13 +73,19 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     graphEventsRef.current.on("layoutStop", () => {
       console.log("GraphCanvas: Layout completed");
     });
-  }, [selectNode]);
+
+    // Handle node double clicks
+    graphEventsRef.current.on("nodeDoubleClick", (nodeData: any) => {
+      console.log("GraphCanvas: Node double-clicked:", nodeData);
+      // Call the new selectComponent method from the store
+      selectComponent(nodeData.id);
+    });
+  }, [selectNode, selectComponent]);
 
   // Initialize the graph core and events
   useEffect(() => {
     // Skip if already successfully initialized
     if (initSuccessful) {
-      console.log("GraphCanvas: Already initialized, skipping");
       return;
     }
 

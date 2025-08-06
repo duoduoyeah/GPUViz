@@ -10,19 +10,19 @@ import { ComponentNodeImpl } from "./componentNode";
 import { PortImpl } from "./port";
 
 // Component Node Builder
-export class ComponentNodeBuilder<T extends NodeInfo> {
-  private componentMap: Map<string, ComponentNode<T>> = new Map();
-  private defaultInfo: T;
+export class ComponentNodeBuilder {
+  private componentMap: Map<string, ComponentNode> = new Map();
+  private defaultInfo: NodeInfo;
 
-  constructor(defaultInfo: T) {
+  constructor(defaultInfo: NodeInfo) {
     this.defaultInfo = defaultInfo;
   }
 
   /**
    * Build component tree from JSON data
-   * @returns Array of root ComponentNode<T> objects
+   * @returns Array of root ComponentNode objects
    */
-  buildFromJson(jsonData: JsonData): ComponentNode<T>[] {
+  buildFromJson(jsonData: JsonData): ComponentNode[] {
     const validationError = this.validateJsonData(jsonData);
     if (validationError) {
       throw new Error(validationError);
@@ -58,13 +58,13 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
     );
   }
 
-  private initializeComponent(jsonComponent: JsonComponent): ComponentNode<T> {
-    const component = new ComponentNodeImpl<T>(jsonComponent.name);
+  private initializeComponent(jsonComponent: JsonComponent): ComponentNode {
+    const component = new ComponentNodeImpl(jsonComponent.name);
 
     // Set component properties using setter methods
     component.setType(this.getType(jsonComponent.name));
     component.setInfo(this.defaultInfo);
-    component.setPorts(this.createPorts(jsonComponent.ports));
+    component.setPorts(this.createPorts(jsonComponent.ports, component));
     component.setShape();
     return component;
   }
@@ -85,7 +85,7 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
   }
 
   private addParentComponent() {
-    const tempComponentList: ComponentNode<T>[] = [];
+    const tempComponentList: ComponentNode[] = [];
     const tempComponentNames = new Set<string>();
 
     // For each component in the map, recursively check the parent
@@ -101,7 +101,7 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
 
   private ensureParentExists(
     componentName: string,
-    tempComponentList: ComponentNode<T>[],
+    tempComponentList: ComponentNode[],
     tempComponentNames: Set<string>,
   ): void {
     const parentName = this.getParentName(componentName);
@@ -132,8 +132,12 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
     tempComponentNames.add(parentName);
   }
 
-  private createPorts(jsonPorts: JsonPort[]): Port[] {
-    return jsonPorts.map((jsonPort) => new PortImpl(jsonPort.name));
+  private createPorts(jsonPorts: JsonPort[], component: ComponentNode): Port[] {
+    return jsonPorts.map((jsonPort) => {
+      const port = new PortImpl(jsonPort.name);
+      port.setOwner(component);
+      return port;
+    });
   }
 
   /**
@@ -189,11 +193,11 @@ export class ComponentNodeBuilder<T extends NodeInfo> {
     }
   }
 
-  getComponent(name: string): ComponentNode<T> | undefined {
+  getComponent(name: string): ComponentNode | undefined {
     return this.componentMap.get(name);
   }
 
-  getAllComponents(): ComponentNode<T>[] {
+  getAllComponents(): ComponentNode[] {
     return Array.from(this.componentMap.values());
   }
 

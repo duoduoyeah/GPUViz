@@ -5,11 +5,11 @@ import { ComponentNodeBuilder } from "../models/componentNodeBuilder";
 import type { NodeInfo, Graph } from "../types";
 
 // Define the store state interface
-interface GpuStoreState<T extends NodeInfo> {
+interface GpuStoreState {
   // Data state
   rawData: any | null;
-  componentTree: ComponentTree<T> | null;
-  componentGraph: ComponentGraph<T> | null;
+  componentTree: ComponentTree| null;
+  componentGraph: ComponentGraph | null;
   currentGraph: Graph | null;
   activeLevel: number;
 
@@ -30,10 +30,11 @@ interface GpuStoreState<T extends NodeInfo> {
   selectNode: (nodeId: string | null) => void;
   setFilter: (filterType: string, value: any) => void;
   toggleConnectionVisibility: () => void;
+  selectComponent: (componentId: string) => void;
 }
 
 // Create the store
-const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
+const useGpuStore = create<GpuStoreState>((set, get) => ({
   // Initial state
   rawData: null,
   componentTree: null,
@@ -59,14 +60,14 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
       const defaultInfo: NodeInfo = {};
 
       // Initialize the component node builder
-      const builder = new ComponentNodeBuilder<NodeInfo>(defaultInfo);
+      const builder = new ComponentNodeBuilder(defaultInfo);
 
       // 1. Convert raw data to component tree
       const rootComponents = builder.buildFromJson(data);
-      const componentTree = new ComponentTree<NodeInfo>(rootComponents);
+      const componentTree = new ComponentTree(rootComponents);
 
       // 2. Create component graph from tree
-      const componentGraph = new ComponentGraph<NodeInfo>(componentTree);
+      const componentGraph = new ComponentGraph(componentTree);
 
       // 3. Create initial graph at default level
       const currentGraph = componentGraph.createGraphAtLevel(get().activeLevel);
@@ -148,6 +149,22 @@ const useGpuStore = create<GpuStoreState<NodeInfo>>((set, get) => ({
 
     // TODO: Update graph based on connection visibility
   },
+
+  // Handle component selection for graph updates (e.g., on double-click)
+  selectComponent: (componentId: string) => {
+    const { componentGraph } = get();
+    
+    if (!componentGraph) {
+      console.warn("Cannot select component: componentGraph is null");
+      return;
+    }
+    
+    // Get the subgraph for this component with its immediate children
+    const newGraph = componentGraph.appendComponent(componentId, 1);
+    
+    set({ currentGraph: newGraph });
+  },
+
 }));
 
 export default useGpuStore;
