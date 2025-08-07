@@ -19,6 +19,8 @@ export class ComponentNodeImpl implements ComponentNode {
   parent: ComponentNode | undefined;
   children: ComponentNode[] = [];
 
+  private _isolated: boolean | undefined;
+
   constructor(name: string) {
     this.name = name;
   }
@@ -86,11 +88,27 @@ export class ComponentNodeImpl implements ComponentNode {
     if (!this.parent) {
       return false;
     }
-    
+
     if (this.parent === node) {
       return true;
     }
-    
+
     return this.parent.isAncestor(node);
+  }
+
+  isIsolated(): boolean {
+    //if _isolated undefined first set it
+    if (this._isolated === undefined) {
+      // one component is isolated if and only if: it has no port, its decedent are all isolated.
+      if (this.ports.length > 0) {
+        this._isolated = false;
+      } else if (this.children.length === 0) {
+        this._isolated = true;
+      } else {
+        this._isolated = this.children.every(child => child.isIsolated());
+      }
+    }
+    
+    return this._isolated;
   }
 }

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { ComponentTree } from "../models/componentTree";
-import { ComponentGraph } from "../models/componentGraph";
+import { ComponentGraphExtractor } from "../models/componentGraph";
+import {CytoscapeGraph} from "../models/cytoscapeGraph"
 import { ComponentNodeBuilder } from "../models/componentNodeBuilder";
 import type { NodeInfo, Graph } from "../types";
 
@@ -8,8 +9,7 @@ import type { NodeInfo, Graph } from "../types";
 interface GpuStoreState {
   // Data state
   rawData: any | null;
-  componentTree: ComponentTree| null;
-  componentGraph: ComponentGraph | null;
+  cytoscapeGraph: CytoscapeGraph | null;
   currentGraph: Graph | null;
   activeLevel: number;
 
@@ -37,8 +37,7 @@ interface GpuStoreState {
 const useGpuStore = create<GpuStoreState>((set, get) => ({
   // Initial state
   rawData: null,
-  componentTree: null,
-  componentGraph: null,
+  cytoscapeGraph: null,
   currentGraph: null,
   activeLevel: 1,
 
@@ -62,21 +61,21 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
       // Initialize the component node builder
       const builder = new ComponentNodeBuilder(defaultInfo);
 
-      // 1. Convert raw data to component tree
+
       const rootComponents = builder.buildFromJson(data);
       const componentTree = new ComponentTree(rootComponents);
 
-      // 2. Create component graph from tree
-      const componentGraph = new ComponentGraph(componentTree);
+      const componentGraphExtractor = new ComponentGraphExtractor(componentTree);
 
+      const cytoscapeGraph = new CytoscapeGraph(componentGraphExtractor);
+    
       // 3. Create initial graph at default level
-      const currentGraph = componentGraph.createGraphAtLevel(get().activeLevel);
+      const currentGraph = cytoscapeGraph.createGraphAtLevel(get().activeLevel);
 
       // Update store with processed data
       set({
         rawData: data,
-        componentTree,
-        componentGraph,
+        cytoscapeGraph,
         currentGraph,
         loading: false,
       });
@@ -90,37 +89,19 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
   },
 
   setActiveLevel: (level) => {
-    const { componentTree, componentGraph } = get();
-    if (!componentTree || !componentGraph) {
-      console.warn(
-        "Cannot set active level: componentTree or componentGraph is null",
-      );
+    const { cytoscapeGraph } = get();
+    
+    if (!cytoscapeGraph) {
+      console.warn("Cannot set active level: cytoscapeGraph is null");
       return;
     }
 
-    const treeDepth = componentTree.getDepth();
-    if (level > treeDepth || level < 0) {
-      console.warn(
-        `Invalid level ${level}: must be between 0 and ${treeDepth}`,
-      );
-      set({
-        error: `Level must be between 0 and ${treeDepth}. Received: ${level}`,
-      });
-      return;
-    }
-
-    set({ activeLevel: level, error: null });
-
-    const currentGraph = componentGraph.createGraphAtLevel(level);
-
-    console.log(
-      `🔄 currentGraph updated in setActiveLevel (level ${level}):`,
-      currentGraph,
-    );
-    console.log("Graph nodes count:", currentGraph?.nodes?.length);
-    console.log("Graph edges count:", currentGraph?.edges?.length);
-
-    set({ currentGraph });
+    const currentGraph = cytoscapeGraph.createGraphAtLevel(level);
+    
+    set({ 
+      activeLevel: level,
+      currentGraph 
+    });
   },
 
   selectNode: (nodeId) => {
@@ -152,15 +133,15 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
 
   // Handle component selection for graph updates (e.g., on double-click)
   selectComponent: (componentId: string) => {
-    const { componentGraph } = get();
+    const { cytoscapeGraph } = get();
     
-    if (!componentGraph) {
-      console.warn("Cannot select component: componentGraph is null");
+    if (!cytoscapeGraph) {
+      console.warn("Cannot select component: cytoscapeGraph is null");
       return;
     }
     
-    // Get the subgraph for this component with its immediate children
-    const newGraph = componentGraph.appendComponent(componentId, 1);
+    // Use the doubleClickComponent method to get the new graph
+    const newGraph = cytoscapeGraph.selectComponent(componentId);
     
     set({ currentGraph: newGraph });
   },

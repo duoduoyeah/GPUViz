@@ -41,9 +41,7 @@ export class ComponentTree implements Tree {
     return this.depth;
   }
   // Finds the first node satisfying the predicate using DFS
-  findNode(
-    predicate: (node: ComponentNode) => boolean,
-  ): ComponentNode | null {
+  findNode(predicate: (node: ComponentNode) => boolean): ComponentNode | null {
     // Helper function for recursive search
     const search = (node: ComponentNode): ComponentNode | null => {
       if (predicate(node)) {

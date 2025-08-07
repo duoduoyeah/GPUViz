@@ -40,4 +40,5 @@ export interface ComponentNode {
   
   //bool
   isAncestor(node: ComponentNode): boolean;
+  isIsolated(): boolean;
 }

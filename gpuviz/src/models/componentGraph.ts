@@ -1,63 +1,80 @@
 import type {
   ComponentNode,
-  Graph,
-  GraphNode,
-  GraphEdge,
-  Port,
+  Edge
 } from "../types";
 import { ComponentTree } from "./componentTree";
 import { componentGraphEdgeHelper as edgeHelper } from "./edgeHelper";
+import { nodeHelper } from "./nodeHelper";
 
-export class ComponentGraph {
+// Define the ComponentGraph type
+export type ComponentGraph = {
+  components: ComponentNode[];
+  edges: Edge[];
+};
+
+// Properly typed decorator function to validate component graph
+export function validateComponentGraph(
+  _target: any,
+  _propertyKey: string | symbol,
+  descriptor: PropertyDescriptor
+): PropertyDescriptor {
+  const originalMethod = descriptor.value;
+
+  descriptor.value = function (...args: any[]): ComponentGraph | null {
+    // Call the original method
+    const result = originalMethod.apply(this, args);
+    if (!result) {
+      return result;
+    }
+
+    edgeHelper.filterEdges(result.edges);
+    edgeHelper.pruneInvalidEdges(result.components, result.edges);
+    return result;
+  };
+
+  return descriptor;
+}
+
+
+// Rename class to ComponentGraphExtractor which better reflects what it does
+export class ComponentGraphExtractor {
   private tree: ComponentTree;
-  private treeDepth: number;
 
   constructor(tree: ComponentTree) {
     this.tree = tree;
-    this.treeDepth = this.initializeHierarchyLevels();
   }
 
-  private initializeHierarchyLevels(): number {
-    return this.tree.depth;
-  }
-
-  buildGraphNodes(components: ComponentNode[]): GraphNode[] {
-    return components.map((component, _): GraphNode => {
-      return {
-        data: {
-          id: component.getName(),
-          label: component.getName(),
-          shape: component.shape,
-          type: component.type,
-          parent: component.getParent()?.getName(),
-        },
-      };
-    });
-  }
-
-
-
-  createGraphAtLevel(level: number): Graph {
+  @validateComponentGraph
+  createGraphAtLevel(level: number): ComponentGraph {
     // Get components at the specified level directly from the tree
     const components = this.tree.getNodesAtLevel(level);
-    
-    // Remove isolated nodes (modifies components array in-place)
-    this.removeIsolatedNodes(components);
+    const edges: Edge[] = [];
 
-    // Convert to graph nodes
-    const nodes = this.buildGraphNodes(components);
-    const edges = edgeHelper.buildGraphEdges(components);
-    const edgesResult = edgeHelper.getGraphEdges(edges)
+    // Remove isolated nodes (modifies components array in-place)
+    nodeHelper.removeIsolatedNodes(components);
+
+    // Collect all edges between the components at this level
+    
+    for (const component of components) {
+      const componentEdges = edgeHelper.collectEdgesFromNode(component);
+      edges.push(...componentEdges);
+    }
+
+
     return {
-      nodes,
-      edges: edgesResult,
+      components,
+      edges
     };
   }
 
-  appendComponent(componentId: string, childrenLevel: number = 1): Graph | null {
+  @validateComponentGraph
+  appendComponent(
+    componentId: string,
+    childrenLevel: number = 1,
+  ): ComponentGraph | null {
     // Find the component node by ID
     const rootNode = this.tree.findNodeByName(componentId);
-    
+
     if (!rootNode) {
       console.warn(`Component with ID ${componentId} not found`);
       return null;
@@ -65,59 +82,22 @@ export class ComponentGraph {
 
     //Get all edges from component
     const edges = edgeHelper.collectEdgesFromNode(rootNode);
-    
-    // Gather the nodes to include in the graph
-    const nodesToInclude: ComponentNode[] = [rootNode];
-    
-    // If childrenLevel > 0, include children up to that depth
-    if (childrenLevel > 0) {
-      this.getDescendantsUpToLevel(rootNode, nodesToInclude, 1, childrenLevel);
-    }
-    
+
+    // Collect all edges related to the rootNode
+    const nodesToInclude = nodeHelper.getDescendantsUpToLevel(rootNode, childrenLevel);
+
     // Remove isolated nodes (modifies nodesToInclude array in-place)
-    this.removeIsolatedNodes(nodesToInclude);
+    nodeHelper.removeIsolatedNodes(nodesToInclude);
 
-    //filter edges
-    edgeHelper.filterAndAdjustEdges(edges, nodesToInclude, rootNode) 
-  
+    //adjust edges
+    edgeHelper.AdjustEdges(edges, nodesToInclude, rootNode);
+
     //add missing nodes
-    edgeHelper.addMissingNodesFromEdges(edges, nodesToInclude)
-  
-    // Build the graph
-    const nodes = this.buildGraphNodes(nodesToInclude);
-    
-    const edgesResult = edgeHelper.getGraphEdges(edges);
-    
-    return {
-      nodes,
-      edges: edgesResult
-    };
-  }
-  
-  private getDescendantsUpToLevel(
-    parent: ComponentNode, 
-    collection: ComponentNode[], 
-    currentLevel: number, 
-    maxLevel: number
-  ): void {
-    if (currentLevel > maxLevel) return;
-    
-    const children = parent.getChildren();
-    children.forEach(child => {
-      collection.push(child);
-      this.getDescendantsUpToLevel(child, collection, currentLevel + 1, maxLevel);
-    });
-  }
+    edgeHelper.addMissingNodesFromEdges(edges, nodesToInclude);
 
-  private removeIsolatedNodes(components: ComponentNode[]): void {
-    // Filter out nodes that have no ports (isolated nodes) and modify the input array
-    const connectedComponents = components.filter(component => {
-      // A node is isolated if it has no ports
-      return component.getPorts().length > 0;
-    });
-    
-    // Clear the original array and add the connected components
-    components.length = 0;
-    components.push(...connectedComponents);
+    return {
+      components: nodesToInclude,
+      edges: edges,
+    };
   }
 }

@@ -1,63 +1,71 @@
-import type { Port } from "../types/component";
+import type { ComponentNode, Port } from "../types/component";
 import type { Edge } from "../types/edge";
-import type { GraphEdge } from "../types/graph";
+import type { GraphEdge } from "../types/cytoscapeGraph";
 
 export class EdgeImpl implements Edge {
   data: {
     readonly id: string;
-    source: Port;
-    target: Port;
+    source: ComponentNode;
+    target: ComponentNode;
   };
 
-  constructor(id: string, source: Port, target: Port) {
+  constructor(sourcePort: Port, targetPort: Port) {
     this.data = {
-      id,
-      source,
-      target
+      id: this.generateId(sourcePort, targetPort),
+      source: sourcePort.getComponent(),
+      target: targetPort.getComponent(),
     };
   }
 
-  /**
-   * Get the source port component name and port name
-   * @returns string representation of source
-   */
-  getSource(): string {
-    return this.data.source.name;
+  generateId(sourcePort: Port, targetPort: Port) {
+    return `${sourcePort.name}_to_${targetPort.name}`;
   }
 
-  /**
-   * Get the target port component name and port name
-   * @returns string representation of target
-   */
-  getTarget(): string {
-    return this.data.target.name;
+  getSource(): ComponentNode {
+    return this.data.source;
   }
 
-  /**
-   * Convert the Edge to a GraphEdge format
-   * @returns GraphEdge representation of this edge
-   */
+  getTarget(): ComponentNode {
+    return this.data.target;
+  }
+
+  getSourceName(): string {
+    return this.data.source.getName();
+  }
+
+  getTargetName(): string {
+    return this.data.target.getName();
+  }
+
   getGraphEdge(): GraphEdge {
     return {
       data: {
         id: this.data.id,
-        source: this.getSource(),
-        target: this.getTarget()
-      }
+        source: this.getSourceName(),
+        target: this.getTargetName(),
+      },
     };
   }
 
-  /**
-   * Compare this edge with another to check if they are the same
-   * Two edges are considered the same if they have the same source and target ports
-   * @param other The other edge to compare with
-   * @returns true if the edges are the same, false otherwise
-   */
   equals(other: Edge): boolean {
-    return (
-      this.getSource() === other.getSource() &&
-      this.getTarget() === other.getTarget()
-    );
+    return this.getId() === other.getId();
   }
-  
+
+  getId(): string {
+    return this.data.id;
+  }
+
+  setSource(source: ComponentNode): void {
+    this.data = {
+      ...this.data,
+      source,
+    };
+  }
+
+  setTarget(target: ComponentNode): void {
+    this.data = {
+      ...this.data,
+      target,
+    };
+  }
 }

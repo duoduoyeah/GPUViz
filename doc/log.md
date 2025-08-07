@@ -5,6 +5,10 @@
 * user input -> panel side logic -> modify the data -> give to cytoscape to update the graph
 
 ---
+8.7
+validation of componentGraph
+
+---
 8.6
 Goal: when slick one component, show this component 
 
