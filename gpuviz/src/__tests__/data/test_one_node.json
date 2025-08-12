@@ -1,0 +1,154 @@
+{
+  "components": [
+    {
+      "name": "A",
+      "ports": [
+        {
+          "name": "A.port1",
+          "incomingPort": null,
+          "outgoingPort": null
+        },
+        {
+          "name": "A.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent1",
+      "ports": [
+        {
+          "name": "A.SubComponent1.port1",
+          "incomingPort": null,
+          "outgoingPort": null
+        },
+        {
+          "name": "A.SubComponent1.port2",
+          "incomingPort": ["A.SubComponent2.port1"],
+          "outgoingPort": ["A.SubComponent2.port1"]
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent1.Unit1",
+      "ports": [
+        {
+          "name": "A.SubComponent1.Unit1.port1",
+          "incomingPort": ["A.SubComponent1.Unit2.port1"],
+          "outgoingPort": null
+        },
+        {
+          "name": "A.SubComponent1.Unit1.port2",
+          "incomingPort": null,
+          "outgoingPort": ["A.SubComponent2.Unit1.port1"]
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent1.Unit2",
+      "ports": [
+        {
+          "name": "A.SubComponent1.Unit2.port1",
+          "incomingPort": null,
+          "outgoingPort": ["A.SubComponent1.Unit1.port1"]
+        },
+        {
+          "name": "A.SubComponent1.Unit2.port2",
+          "incomingPort": null,
+          "outgoingPort": ["A.SubComponent2.port1"]
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent2",
+      "ports": [
+        {
+          "name": "A.SubComponent2.port1",
+          "incomingPort": ["A.SubComponent1.port2", "A.SubComponent1.Unit2.port2"],
+          "outgoingPort": ["B.port1"]
+        },
+        {
+          "name": "A.SubComponent2.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent2.Unit1",
+      "ports": [
+        {
+          "name": "A.SubComponent2.Unit1.port1",
+          "incomingPort": ["A.SubComponent1.Unit1.port2"],
+          "outgoingPort": null
+        },
+        {
+          "name": "A.SubComponent2.Unit1.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent3",
+      "ports": [
+        {
+          "name": "A.SubComponent3.port1",
+          "incomingPort": null,
+          "outgoingPort": null
+        },
+        {
+          "name": "A.SubComponent3.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    },
+    {
+      "name": "A.SubComponent3.Unit1",
+      "ports": [
+        {
+          "name": "A.SubComponent3.Unit1.port1",
+          "incomingPort": null,
+          "outgoingPort": null
+        },
+        {
+          "name": "A.SubComponent3.Unit1.port2",
+          "incomingPort": null,
+          "outgoingPort": ["C.Subcomponent1.port1"]
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "ports": [
+        {
+          "name": "B.port1",
+          "incomingPort": ["A.SubComponent2.port1"],
+          "outgoingPort": null
+        },
+        {
+          "name": "B.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    },
+    {
+      "name": "C.Subcomponent1",
+      "ports": [
+        {
+          "name": "C.Subcomponent1.port1",
+          "incomingPort": ["A.SubComponent3.Unit1.port2"],
+          "outgoingPort": null
+        },
+        {
+          "name": "C.Subcomponent1.port2",
+          "incomingPort": null,
+          "outgoingPort": null
+        }
+      ]
+    }
+  ]
+}
