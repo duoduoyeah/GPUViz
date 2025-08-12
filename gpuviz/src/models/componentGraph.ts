@@ -82,6 +82,7 @@ export class ComponentGraphExtractor {
 
     //Get all edges from component
     const edges = edgeHelper.collectEdgesFromNode(rootNode);
+    console.log("Collected edges from component:", edges, "Length:", edges.length);
 
     // Collect all edges related to the rootNode
     const nodesToInclude = nodeHelper.getDescendantsUpToLevel(rootNode, childrenLevel);

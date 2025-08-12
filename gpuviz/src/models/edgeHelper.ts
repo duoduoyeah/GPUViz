@@ -55,9 +55,6 @@ export interface EdgeHelper {
 export interface ComponentGraphEdgeHelper extends EdgeHelper {
 
 
-  /**
-   * Build edges between a component and its subcomponents
-   */
   collectEdgesFromNode(root: ComponentNode): Edge[];
 
   /**
@@ -124,7 +121,6 @@ export function getEdgesFromComponent(component: ComponentNode): Edge[] {
     const portEdges = getEdgesFromPort(port);
     allEdges.push(...portEdges);
   }
-
   return allEdges;
 }
 
@@ -160,8 +156,8 @@ export function filterDuplicateEdgesbySides(edges: Edge[]) {
   const connectionKeys = new Set<string>();
 
   for (const edge of edges) {
-    // Create a unique key based on source and target
-    const connectionKey = `${edge.getSource()}->${edge.getTarget()}`;
+    // Create a unique key based on source and target names
+    const connectionKey = `${edge.getSource().getName()}->${edge.getTarget().getName()}`;
 
     if (!connectionKeys.has(connectionKey)) {
       connectionKeys.add(connectionKey);
@@ -245,8 +241,9 @@ export function collectEdgesFromNode(node: ComponentNode): Edge[] {
   }
 
   const allEdges = collectEdgesHelper(node);
-
+  console.log("Collected edges from component:", allEdges, "Length:", allEdges.length);
   filterEdges(allEdges);
+  console.log("[After Filter] Collected edges from component:", allEdges, "Length:", allEdges.length);
   return allEdges;
 }
 
@@ -297,7 +294,7 @@ export function AdjustEdges(
       }
     }
   }
-
+  
   filterDuplicateEdges(edges);
 }
 
