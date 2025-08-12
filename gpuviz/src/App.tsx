@@ -9,7 +9,7 @@ import { DEFAULT_DATA_PATH } from "./config/default";
 import "./App.css";
 
 const App: React.FC = () => {
-  const { loadData, setActiveLevel, loading, error, rawData } = useGpuStore();
+  const { loadData, setActiveLevel, modifyGraph, loading, error, rawData } = useGpuStore();
   const graphCanvasRef = useRef<GraphCanvasHandles>(null);
 
   // Load default data on app initialization
@@ -36,17 +36,22 @@ const App: React.FC = () => {
 
   // Handle config panel updates
   const handleConfigSubmit = (config: {
-    level: number;
-    filter: "all" | "memory" | "compute";
+    filter: "all" | "tidy";
     selectedItems: string[];
   }) => {
     console.log("Config updated:", config);
 
-    // Update active level in the store
-    setActiveLevel(config.level);
+    // Apply the graph filter mode (all or tidy)
+    modifyGraph(config.filter);
 
-    // TODO: Apply filters and selectedItems
+    // TODO: Apply selectedItems
     // This will be implemented when filtering is added to the store
+  };
+
+  // Handle level updates separately
+  const handleLevelChange = (level: number) => {
+    console.log("Level updated:", level);
+    setActiveLevel(level);
   };
 
   // Show initial loading state
@@ -78,6 +83,7 @@ const App: React.FC = () => {
         leftPanel={
           <ConfigPanel
             onSubmit={handleConfigSubmit}
+            onLevelChange={handleLevelChange}
             graphCanvasRef={graphCanvasRef}
           />
         }

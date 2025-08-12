@@ -39,9 +39,25 @@ export function validateComponentGraph(
 // Rename class to ComponentGraphExtractor which better reflects what it does
 export class ComponentGraphExtractor {
   private tree: ComponentTree;
+  private graph: ComponentGraph;
+  private componentTypeMap: Record<string, ComponentNode[]>;
+  private edgeTypeMap: Record<string, Edge[]>;
 
   constructor(tree: ComponentTree) {
     this.tree = tree;
+    this.graph = {
+      components: [],
+      edges: []
+    };
+    this.componentTypeMap = {};
+    this.edgeTypeMap = {};    
+  }
+
+  @validateComponentGraph
+  updateComponentGraph(componentGraph: ComponentGraph) {
+    this.graph = componentGraph;
+    this.updateComponentTypeMap();
+    this.updateEdgeTypeMap();
   }
 
   @validateComponentGraph
@@ -60,11 +76,17 @@ export class ComponentGraphExtractor {
       edges.push(...componentEdges);
     }
 
-
-    return {
+    const graph = {
       components,
       edges
     };
+
+    // Update the internal graph and type maps
+    this.graph = graph;
+    this.updateComponentTypeMap();
+    this.updateEdgeTypeMap();
+
+    return graph;
   }
 
   @validateComponentGraph
@@ -82,7 +104,7 @@ export class ComponentGraphExtractor {
 
     //Get all edges from component
     const edges = edgeHelper.collectEdgesFromNode(rootNode);
-    console.log("Collected edges from component:", edges, "Length:", edges.length);
+    // console.log("Collected edges from component:", edges, "Length:", edges.length);
 
     // Collect all edges related to the rootNode
     const nodesToInclude = nodeHelper.getDescendantsUpToLevel(rootNode, childrenLevel);
@@ -96,9 +118,91 @@ export class ComponentGraphExtractor {
     //add missing nodes
     edgeHelper.addMissingNodesFromEdges(edges, nodesToInclude);
 
-    return {
+    const graph = {
       components: nodesToInclude,
       edges: edges,
     };
+
+    // Update the internal graph and type maps
+    this.graph = graph;
+    this.updateComponentTypeMap();
+    this.updateEdgeTypeMap();
+
+    return graph;
   }
+
+  getGraph(): ComponentGraph {
+    return this.graph;
+  }
+
+  private updateComponentTypeMap(): void {
+    // Reset the component type map
+    this.componentTypeMap = {};
+    
+    // Group components by their type
+    for (const component of this.graph.components) {
+      const componentType = component.type;
+      
+      if (!this.componentTypeMap[componentType]) {
+        this.componentTypeMap[componentType] = [];
+      }
+      
+      this.componentTypeMap[componentType].push(component);
+    }
+  }
+
+  private updateEdgeTypeMap(): void {
+    // Reset the edge type map
+    this.edgeTypeMap = {};
+    
+    // Group edges by combination of source and target component types
+    for (const edge of this.graph.edges) {
+      const sourceType = edge.getSource().type;
+      const targetType = edge.getTarget().type;
+      const edgeTypeKey = `${sourceType}->${targetType}`;
+      
+      if (!this.edgeTypeMap[edgeTypeKey]) {
+        this.edgeTypeMap[edgeTypeKey] = [];
+      }
+      
+      this.edgeTypeMap[edgeTypeKey].push(edge);
+    }
+  }
+
+  getComponentTypeMap(): Record<string, ComponentNode[]> {
+    return this.componentTypeMap;
+  }
+
+  getEdgeTypeMap(): Record<string, Edge[]> {
+    return this.edgeTypeMap;
+  }
+
+
+  copyGraph(): ComponentGraph {
+    const copiedEdges = this.graph.edges.map(edge => edge.copyEdge());
+    
+    return {
+      components: this.graph.components, // Reuse original components
+      edges: copiedEdges // Use copied edges
+    };
+  }
+
+  consolidateGraph(): ComponentGraph {
+    const tidyGraph: ComponentGraph = {
+      components: [],
+      edges: []
+    };
+    const currentType: Set<string> = new Set();
+  
+    for (const key in this.componentTypeMap) {
+      if (!currentType.has(key)) {
+        
+      }
+    }
+    
+
+
+    return tidyGraph;
+  }
+
 }

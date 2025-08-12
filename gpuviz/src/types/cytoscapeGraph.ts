@@ -18,7 +18,7 @@ export interface GraphEdge {
   };
 }
 
-export interface Graph {
+export interface CytoscapeGraph {
   nodes: GraphNode[];
   edges: GraphEdge[];
 }

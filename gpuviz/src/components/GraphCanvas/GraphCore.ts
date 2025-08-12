@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import type { Graph } from "../../types";
+import type { CytoscapeGraph } from "../../types";
 import { DEFAULT_GRAPH_OPTIONS, LAYOUT_PRESETS } from "./GraphConfig";
 import type { LayoutType } from "./GraphConfig";
 
@@ -25,7 +25,7 @@ export class GraphCore {
     }
   }
 
-  updateGraph(graph: Graph | null): void {
+  updateGraph(graph: CytoscapeGraph | null): void {
     if (!this.cy) return;
 
     this.cy.elements().remove();
@@ -101,8 +101,18 @@ export class GraphCore {
     return !!this.cy;
   }
 
+  getCanvasDimensions(): { width: number; height: number } | null {
+    if (!this.container) return null;
+    const rect = this.container.getBoundingClientRect();
+    return {
+      width: rect.width,
+      height: rect.height
+    };
+  }
+
   getState(): any {
     if (!this.cy) return null;
+    const dimensions = this.getCanvasDimensions();
     return {
       zoom: this.cy.zoom(),
       pan: this.cy.pan(),
@@ -110,6 +120,7 @@ export class GraphCore {
       nodeCount: this.cy.nodes().length,
       edgeCount: this.cy.edges().length,
       isReady: this.isReady(),
+      canvasDimensions: dimensions,
     };
   }
 

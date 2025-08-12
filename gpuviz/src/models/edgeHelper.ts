@@ -241,9 +241,9 @@ export function collectEdgesFromNode(node: ComponentNode): Edge[] {
   }
 
   const allEdges = collectEdgesHelper(node);
-  console.log("Collected edges from component:", allEdges, "Length:", allEdges.length);
+  // console.log("Collected edges from component:", allEdges, "Length:", allEdges.length);
   filterEdges(allEdges);
-  console.log("[After Filter] Collected edges from component:", allEdges, "Length:", allEdges.length);
+  // console.log("[After Filter] Collected edges from component:", allEdges, "Length:", allEdges.length);
   return allEdges;
 }
 

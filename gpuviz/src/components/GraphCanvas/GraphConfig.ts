@@ -60,13 +60,6 @@ export const DEFAULT_CYTOSCAPE_STYLES = [
       "border-color": GRAPH_CONFIG.SELECTED_NODE_BORDER_COLOR,
     },
   },
-  {
-    selector: "node:hover",
-    style: {
-      "background-color": "#34495e",
-      "border-color": "#2c3e50",
-    },
-  },
 ];
 
 // Layout presets

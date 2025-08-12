@@ -8,6 +8,7 @@ export interface Edge {
     readonly id: string;
     source: ComponentNode;
     target: ComponentNode;
+    combinedEdgeCount: number;
   };
 
   getGraphEdge(): GraphEdge;
@@ -16,7 +17,10 @@ export interface Edge {
   getSourceName(): string;
   getTargetName(): string;
   getId(): string;
+  getCombinedEdgeCount(): number;
 
   setSource(source: ComponentNode): void;
   setTarget(target: ComponentNode): void;
+  setCombinedEdgeCount(count: number): void;
+  copyEdge(): Edge;
 }

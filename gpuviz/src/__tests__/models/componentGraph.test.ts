@@ -1,4 +1,4 @@
-import { ComponentGraphExtractor } from "../../models/componentGraph";
+import { ComponentGraphExtractor } from "../../models/componentGraphBuilder";
 import { ComponentTree } from "../../models/componentTree";
 import { ComponentNodeBuilder } from "../../models/componentNodeBuilder";
 import type { JsonData } from "../../types";

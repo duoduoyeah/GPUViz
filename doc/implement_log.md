@@ -2,6 +2,17 @@
 
 
 ---
+08-12
+## click to display node info
+
+in cytoscapeGraph, I want to do this:
+1. for each/all some component, I will add a type to it.
+2. when many same-type components show in the graph, they will
+range(排列) in a more organized way.
+
+
+
+---
 08-06-2025
 
 ## appendComponent

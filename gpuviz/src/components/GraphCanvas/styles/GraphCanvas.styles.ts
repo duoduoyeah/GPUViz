@@ -75,36 +75,6 @@ export const styles = {
     fontWeight: "500",
   } as CSSProperties,
 
-  nodeInfo: {
-    position: "fixed", // Changed from absolute to fixed for more stable positioning
-    top: "80px",
-    right: "16px",
-    backgroundColor: "#ffffff",
-    border: "1px solid #e0e0e0",
-    borderRadius: "4px",
-    padding: "12px",
-    minWidth: "200px",
-    maxWidth: "300px", // Added max-width to prevent expansion
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-    zIndex: 999,
-    transform: "translateZ(0)", // Force hardware acceleration for smoother rendering
-  } as CSSProperties,
-
-  nodeInfoTitle: {
-    fontSize: "14px",
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: "8px",
-    borderBottom: "1px solid #e0e0e0",
-    paddingBottom: "4px",
-  } as CSSProperties,
-
-  nodeInfoContent: {
-    fontSize: "12px",
-    color: "#666",
-    lineHeight: "1.4",
-  } as CSSProperties,
-
   errorNotification: {
     position: "fixed", // Changed from absolute to fixed for more stable positioning
     top: "16px",

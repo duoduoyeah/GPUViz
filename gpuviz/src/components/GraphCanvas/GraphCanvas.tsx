@@ -9,9 +9,11 @@ import React, {
 import useGpuStore from "../../store/gpuStore";
 import { GraphCore } from "./GraphCore";
 import { GraphEvents } from "./GraphEvents";
-import { styles } from "./GraphCanvas.styles";
+import { styles } from "./styles/GraphCanvas.styles";
 import type { LayoutType } from "./GraphConfig";
 import ErrorBoundary from "./ErrorBoundary";
+import InfoPanel from "./InfoPanel";
+import DebugPanel from "./DebugPanel";
 
 export interface GraphCanvasHandles {
   fit: () => void;
@@ -21,6 +23,7 @@ export interface GraphCanvasHandles {
   getState: () => any;
   selectElement: (id: string) => void;
   unselectAll: () => void;
+  getCanvasDimensions: () => { width: number; height: number } | null;
 }
 
 /**
@@ -36,13 +39,13 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
   const graphEventsRef = useRef<GraphEvents | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [currentLayout, setCurrentLayout] = useState<LayoutType>("grid");
-
+  const [showDebugPanel, setShowDebugPanel] = useState(true);
 
   // Track if initialization has been successful
   const [initSuccessful, setInitSuccessful] = useState(false);
 
   // Get graph data from store
-  const { currentGraph, loading, error, selectNode, selectComponent } = useGpuStore();
+  const { currentGraph, loading, error, selectNode, selectComponent, selectedNodeInfo } = useGpuStore();
 
   // Setup event handlers for graph interactions
   const setupEventHandlers = useCallback(() => {
@@ -190,6 +193,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     getState: () => graphCoreRef.current?.getState(),
     selectElement: (id: string) => graphEventsRef.current?.selectElement(id),
     unselectAll: () => graphEventsRef.current?.unselectAll(),
+    getCanvasDimensions: () => graphCoreRef.current?.getCanvasDimensions() || null,
   }));
 
   // Render different states
@@ -224,6 +228,15 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
         {/* Graph container */}
         <div ref={containerRef} style={styles.graphContainer} />
 
+        {/* Component info panel (left side) */}
+        <InfoPanel
+          selectedNodeInfo={selectedNodeInfo}
+          currentGraph={currentGraph}
+          selectNode={selectNode}
+          selectComponent={selectComponent}
+        />
+
+
         {/* Error notification */}
         {error && (
           <div style={styles.errorNotification}>
@@ -236,29 +249,16 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
           </div>
         )}
 
-        {/* Debug info (can be removed in production) */}
-        {isReady && (
-          <div style={styles.nodeInfo}>
-            <div style={styles.nodeInfoTitle}>Graph Info</div>
-            <div style={styles.nodeInfoContent}>
-              Layout: {currentLayout}
-              <br />
-              Nodes: {currentGraph.nodes.length}
-              <br />
-              Edges: {currentGraph.edges.length}
-              <br />
-              Status: {isReady ? "Ready" : "Not Ready"}
-              <br />
-              Init: {initSuccessful ? "Success" : "Pending"}
-              {error && (
-                <>
-                  <br />
-                  Error: Present
-                </>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Debug info panel (right side) */}
+        <DebugPanel
+          isReady={isReady}
+          currentGraph={currentGraph}
+          currentLayout={currentLayout}
+          initSuccessful={initSuccessful}
+          error={error}
+          showDebugPanel={showDebugPanel}
+          onToggleDebugPanel={() => setShowDebugPanel(!showDebugPanel)}
+        />
       </div>
     </ErrorBoundary>
   );

@@ -7,6 +7,7 @@ export class EdgeImpl implements Edge {
     readonly id: string;
     source: ComponentNode;
     target: ComponentNode;
+    combinedEdgeCount: number;
   };
 
   constructor(sourcePort: Port, targetPort: Port) {
@@ -14,6 +15,7 @@ export class EdgeImpl implements Edge {
       id: this.generateId(sourcePort, targetPort),
       source: sourcePort.getComponent(),
       target: targetPort.getComponent(),
+      combinedEdgeCount: 1,
     };
   }
 
@@ -55,6 +57,10 @@ export class EdgeImpl implements Edge {
     return this.data.id;
   }
 
+  getCombinedEdgeCount(): number {
+    return this.data.combinedEdgeCount;
+  }
+
   setSource(source: ComponentNode): void {
     this.data = {
       ...this.data,
@@ -67,5 +73,21 @@ export class EdgeImpl implements Edge {
       ...this.data,
       target,
     };
+  }
+
+  setCombinedEdgeCount(count: number): void {
+    this.data = {
+      ...this.data,
+      combinedEdgeCount: count,
+    };
+  }
+
+  copyEdge(): Edge {
+    const copy = new EdgeImpl(
+      { name: this.data.source.getName(), getComponent: () => this.data.source } as Port,
+      { name: this.data.target.getName(), getComponent: () => this.data.target } as Port
+    );
+    copy.setCombinedEdgeCount(this.data.combinedEdgeCount);
+    return copy;
   }
 }

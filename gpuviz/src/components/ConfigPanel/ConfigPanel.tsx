@@ -5,27 +5,21 @@ import type { GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
 
 interface ConfigPanelProps {
   onSubmit: (config: {
-    level: number;
-    filter: "all" | "memory" | "compute";
+    filter: "all" | "tidy";
     selectedItems: string[];
   }) => void;
+  onLevelChange: (level: number) => void;
   graphCanvasRef: RefObject<GraphCanvasHandles | null>;
 }
 
-// Mock data - replace with actual data source
-const mockItems = {
-  all: ["item-A", "item-B", "item-C", "item-D"],
-  memory: ["mem-1", "mem-2", "mem-3"],
-  compute: ["comp-1", "comp-2", "comp-3"],
-};
-
 export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   onSubmit,
+  onLevelChange,
   graphCanvasRef,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [level, setLevel] = useState<number | "">("");
-  const [filter, setFilter] = useState<"all" | "memory" | "compute">("all");
+  const [filter, setFilter] = useState<"all" | "tidy">("all");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleItemToggle = (item: string) => {
@@ -36,16 +30,19 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
 
   const handleSubmit = () => {
     onSubmit({
-      level: typeof level === "number" ? level : 0,
       filter,
       selectedItems,
     });
   };
 
-  const getFilteredItems = () => {
-    // TODO: Filter items based on level and filter type
-    // This is mock implementation
-    return mockItems[filter];
+  const handleLevelUpdate = () => {
+    const levelValue = typeof level === "number" ? level : 0;
+    onLevelChange(levelValue);
+  };
+
+  const getViewItems = () => {
+    // TODO: Implement actual view items based on level and view mode
+    return [];
   };
 
   const handleFit = () => graphCanvasRef.current?.fit();
@@ -94,6 +91,9 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             placeholder="0"
           />
         </label>
+        <button onClick={handleLevelUpdate} style={styles.submitButton}>
+          Update Level
+        </button>
       </div>
 
       {/* Filter toggle */}
@@ -107,23 +107,17 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             All
           </button>
           <button
-            onClick={() => setFilter("memory")}
-            style={styles.filterButton(filter === "memory")}
+            onClick={() => setFilter("tidy")}
+            style={styles.filterButton(filter === "tidy")}
           >
-            Memory
-          </button>
-          <button
-            onClick={() => setFilter("compute")}
-            style={styles.filterButton(filter === "compute")}
-          >
-            Compute
+            Tidy
           </button>
         </div>
       </div>
 
       {/* Item list */}
       <div style={styles.itemList}>
-        {getFilteredItems().map((item) => (
+        {getViewItems().map((item) => (
           <label key={item} style={styles.itemLabel}>
             <input
               type="checkbox"
@@ -139,7 +133,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
       {/* Submit button */}
       <div style={styles.submitSection}>
         <button onClick={handleSubmit} style={styles.submitButton}>
-          Update Graph
+          Apply Filters
         </button>
       </div>
 
