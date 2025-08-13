@@ -1,6 +1,6 @@
-import type { CytoscapeGraph } from "../types/cytoscapeGraph";
-import { nodeHelper } from "./nodeHelper";
-import { baseEdgeHelper as edgeHelper } from "./edgeHelper";
+import type { CytoscapeGraph } from "../types/cytoscapeGraph.type";
+import { componentHelper } from "./component/componentHelper";
+import { baseEdgeHelper as edgeHelper } from "./edge/edgeHelper";
 import { ComponentGraphExtractor } from "./componentGraphBuilder";
 import type { ComponentGraph } from "./componentGraphBuilder";
 /**
@@ -18,7 +18,7 @@ export class CytoscapeGraphBuilder {
     if (updateComponentGraph) {
       this.graphExtractor.updateComponentGraph(componentGraph);
     }
-    const nodes = nodeHelper.buildGraphNodes(componentGraph.components);
+    const nodes = componentHelper.buildGraphNodes(componentGraph.components);
     const edges = edgeHelper.buildGraphEdges(componentGraph.edges);
 
     return {

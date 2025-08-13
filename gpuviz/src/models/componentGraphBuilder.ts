@@ -3,8 +3,9 @@ import type {
   Edge
 } from "../types";
 import { ComponentTree } from "./componentTree";
-import { componentGraphEdgeHelper as edgeHelper } from "./edgeHelper";
-import { nodeHelper } from "./nodeHelper";
+import { componentGraphEdgeHelper as edgeHelper } from "./edge/edgeHelper";
+import { componentHelper } from "./component/componentHelper";
+import { EdgeTypeMap } from "./edge/edgeTypeMap";
 
 // Define the ComponentGraph type
 export type ComponentGraph = {
@@ -41,7 +42,7 @@ export class ComponentGraphExtractor {
   private tree: ComponentTree;
   private graph: ComponentGraph;
   private componentTypeMap: Record<string, ComponentNode[]>;
-  private edgeTypeMap: Record<string, Edge[]>;
+  private edgeTypeMap: EdgeTypeMap;
 
   constructor(tree: ComponentTree) {
     this.tree = tree;
@@ -50,7 +51,7 @@ export class ComponentGraphExtractor {
       edges: []
     };
     this.componentTypeMap = {};
-    this.edgeTypeMap = {};    
+    this.edgeTypeMap = new EdgeTypeMap();    
   }
 
   @validateComponentGraph
@@ -67,7 +68,7 @@ export class ComponentGraphExtractor {
     const edges: Edge[] = [];
 
     // Remove isolated nodes (modifies components array in-place)
-    nodeHelper.removeIsolatedNodes(components);
+    componentHelper.removeIsolatedNodes(components);
 
     // Collect all edges between the components at this level
     
@@ -82,9 +83,7 @@ export class ComponentGraphExtractor {
     };
 
     // Update the internal graph and type maps
-    this.graph = graph;
-    this.updateComponentTypeMap();
-    this.updateEdgeTypeMap();
+    this.updateComponentGraph(graph);
 
     return graph;
   }
@@ -107,10 +106,10 @@ export class ComponentGraphExtractor {
     // console.log("Collected edges from component:", edges, "Length:", edges.length);
 
     // Collect all edges related to the rootNode
-    const nodesToInclude = nodeHelper.getDescendantsUpToLevel(rootNode, childrenLevel);
+    const nodesToInclude = componentHelper.getDescendantsUpToLevel(rootNode, childrenLevel);
 
     // Remove isolated nodes (modifies nodesToInclude array in-place)
-    nodeHelper.removeIsolatedNodes(nodesToInclude);
+    componentHelper.removeIsolatedNodes(nodesToInclude);
 
     //adjust edges
     edgeHelper.AdjustEdges(edges, nodesToInclude, rootNode);
@@ -124,9 +123,7 @@ export class ComponentGraphExtractor {
     };
 
     // Update the internal graph and type maps
-    this.graph = graph;
-    this.updateComponentTypeMap();
-    this.updateEdgeTypeMap();
+    this.updateComponentGraph(graph);
 
     return graph;
   }
@@ -153,19 +150,11 @@ export class ComponentGraphExtractor {
 
   private updateEdgeTypeMap(): void {
     // Reset the edge type map
-    this.edgeTypeMap = {};
+    this.edgeTypeMap.clear();
     
-    // Group edges by combination of source and target component types
+    // Add all edges to the edge type map
     for (const edge of this.graph.edges) {
-      const sourceType = edge.getSource().type;
-      const targetType = edge.getTarget().type;
-      const edgeTypeKey = `${sourceType}->${targetType}`;
-      
-      if (!this.edgeTypeMap[edgeTypeKey]) {
-        this.edgeTypeMap[edgeTypeKey] = [];
-      }
-      
-      this.edgeTypeMap[edgeTypeKey].push(edge);
+      this.edgeTypeMap.addEdge(edge);
     }
   }
 
@@ -173,7 +162,7 @@ export class ComponentGraphExtractor {
     return this.componentTypeMap;
   }
 
-  getEdgeTypeMap(): Record<string, Edge[]> {
+  getEdgeTypeMap(): EdgeTypeMap {
     return this.edgeTypeMap;
   }
 
@@ -187,19 +176,17 @@ export class ComponentGraphExtractor {
     };
   }
 
+  @validateComponentGraph
   consolidateGraph(): ComponentGraph {
     const tidyGraph: ComponentGraph = {
       components: [],
       edges: []
     };
-    const currentType: Set<string> = new Set();
-  
-    for (const key in this.componentTypeMap) {
-      if (!currentType.has(key)) {
-        
-      }
-    }
+
     
+    const currentType: Set<string> = new Set();
+    const currentComponents: Set<string> = new Set();
+    const currentEdges: Set<string> = new Set();
 
 
     return tidyGraph;

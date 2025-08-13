@@ -3,7 +3,7 @@ import type {
   Port,
   NodeInfo,
   ComponentKind,
-} from "../types/index";
+} from "../../types/index";
 
 // Create a class that implements the ComponentNode interface
 export class ComponentNodeImpl implements ComponentNode {
@@ -18,11 +18,16 @@ export class ComponentNodeImpl implements ComponentNode {
 
   parent: ComponentNode | undefined;
   children: ComponentNode[] = [];
+  subComponents: ComponentNode[] = [];
 
   private _isolated: boolean | undefined;
 
   constructor(name: string) {
     this.name = name;
+  }
+
+  setSubComponents(components: ComponentNode[]) {
+    this.subComponents = components;
   }
 
   setType(type: string): void {
@@ -72,6 +77,10 @@ export class ComponentNodeImpl implements ComponentNode {
 
   getChildren(): ComponentNode[] {
     return this.children;
+  }
+
+  getSubcomponents(): ComponentNode[] {
+    return this.subComponents;
   }
 
   // Method to add a child node

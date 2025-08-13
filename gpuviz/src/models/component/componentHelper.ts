@@ -1,6 +1,6 @@
-import type { ComponentNode, GraphNode, Edge } from "../types";
+import type { ComponentNode, GraphNode} from "../../types";
 
-export interface NodeHelper {
+export interface ComponentHelper {
   buildGraphNodes(components: ComponentNode[]): GraphNode[];
   removeIsolatedNodes(components: ComponentNode[]): void;
   getDescendantsUpToLevel(
@@ -9,7 +9,7 @@ export interface NodeHelper {
   ): ComponentNode[];
 }
 
-class NodeHelperImpl implements NodeHelper {
+class ComponentHelperImpl implements ComponentHelper {
   buildGraphNodes(components: ComponentNode[]): GraphNode[] {
     return components.map((component, _): GraphNode => {
       return {
@@ -72,4 +72,4 @@ class NodeHelperImpl implements NodeHelper {
 
 }
 
-export const nodeHelper: NodeHelper = new NodeHelperImpl();
+export const componentHelper: ComponentHelper = new ComponentHelperImpl();

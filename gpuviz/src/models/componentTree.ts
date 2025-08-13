@@ -1,5 +1,5 @@
 import type { ComponentNode, NodeInfo, Tree } from "../types";
-import { ComponentNodeImpl } from "./componentNode";
+import { ComponentNodeImpl } from "./component/componentNode";
 
 export class ComponentTree implements Tree {
   root: ComponentNode;

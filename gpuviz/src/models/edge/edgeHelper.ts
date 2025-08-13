@@ -1,4 +1,4 @@
-import type { Port, GraphEdge, Edge, ComponentNode } from "../types/index";
+import type { Port, GraphEdge, Edge, ComponentNode } from "../../types/index";
 import { EdgeImpl } from "./edge";
 
 /**

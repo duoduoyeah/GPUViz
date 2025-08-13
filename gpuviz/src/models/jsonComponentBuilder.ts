@@ -6,7 +6,7 @@ import type {
   JsonComponent,
   JsonPort,
 } from "../types";
-import { ComponentNodeImpl } from "./componentNode";
+import { ComponentNodeImpl } from "./component/componentNode";
 import { PortImpl } from "./port";
 
 // Component Node Builder

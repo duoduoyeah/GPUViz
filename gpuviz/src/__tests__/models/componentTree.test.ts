@@ -1,5 +1,5 @@
 import { ComponentTree } from "../../models/componentTree";
-import { ComponentNodeBuilder } from "../../models/componentNodeBuilder";
+import { ComponentNodeBuilder } from "../../models/jsonComponentBuilder";
 import type { JsonData, NodeInfo } from "../../types";
 import { testJsonPath } from "../../config/test";
 import * as fs from "fs";

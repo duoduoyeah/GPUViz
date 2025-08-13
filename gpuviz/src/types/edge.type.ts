@@ -1,5 +1,5 @@
-import type { ComponentNode } from "./component";
-import type { GraphEdge } from "./cytoscapeGraph";
+import type { ComponentNode } from "./component.type";
+import type { GraphEdge } from "./cytoscapeGraph.type";
 
 
 // Edge is an itermediate representation of GraphEdge 

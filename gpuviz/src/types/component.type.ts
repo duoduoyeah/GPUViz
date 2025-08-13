@@ -21,6 +21,7 @@ export interface ComponentNode {
   ports: Port[];
   parent: ComponentNode | undefined;
   children: ComponentNode[];
+  subComponents: ComponentNode[];
   shape: ComponentKind;
 
   //get
@@ -29,10 +30,12 @@ export interface ComponentNode {
   getPorts(): Port[];
   getParent(): ComponentNode | undefined;
   getChildren(): ComponentNode[];
+  getSubcomponents(): ComponentNode[];
 
   //set
   setParent(parent: ComponentNode): void;
   setChildren(children: ComponentNode[]): void;
+  setSubComponents(components: ComponentNode[]): void;
   setInfo(info: NodeInfo): void;
   setPorts(ports: Port[]): void;
   setShape(): void;

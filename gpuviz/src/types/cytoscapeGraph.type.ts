@@ -1,4 +1,4 @@
-import type { ComponentKind } from "./component";
+import type { ComponentKind } from "./component.type";
 
 export interface GraphNode {
   data: {

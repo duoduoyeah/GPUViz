@@ -1,4 +1,4 @@
-import type { ComponentNode } from "./component";
+import type { ComponentNode } from "./component.type";
 
 export interface Tree {
   root: ComponentNode;
