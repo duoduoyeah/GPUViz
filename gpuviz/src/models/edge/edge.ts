@@ -1,22 +1,16 @@
-import type { ComponentNode, Port } from "../types/component";
-import type { Edge } from "../types/edge";
-import type { GraphEdge } from "../types/cytoscapeGraph";
+import type { ComponentNode, Port, Edge, GraphEdge} from "../..//types";
 
 export class EdgeImpl implements Edge {
-  data: {
-    readonly id: string;
-    source: ComponentNode;
-    target: ComponentNode;
-    combinedEdgeCount: number;
-  };
+
+  readonly id: string;
+  source: ComponentNode;
+  target: ComponentNode;
 
   constructor(sourcePort: Port, targetPort: Port) {
-    this.data = {
-      id: this.generateId(sourcePort, targetPort),
-      source: sourcePort.getComponent(),
-      target: targetPort.getComponent(),
-      combinedEdgeCount: 1,
-    };
+    this.id = this.generateId(sourcePort, targetPort);
+    this.source = sourcePort.getComponent();
+    this.target = targetPort.getComponent();
+
   }
 
   generateId(sourcePort: Port, targetPort: Port) {
@@ -24,25 +18,25 @@ export class EdgeImpl implements Edge {
   }
 
   getSource(): ComponentNode {
-    return this.data.source;
+    return this.source;
   }
 
   getTarget(): ComponentNode {
-    return this.data.target;
+    return this.target;
   }
 
   getSourceName(): string {
-    return this.data.source.getName();
+    return this.source.getName();
   }
 
   getTargetName(): string {
-    return this.data.target.getName();
+    return this.target.getName();
   }
 
   getGraphEdge(): GraphEdge {
     return {
       data: {
-        id: this.data.id,
+        id: this.id,
         source: this.getSourceName(),
         target: this.getTargetName(),
       },
@@ -54,40 +48,48 @@ export class EdgeImpl implements Edge {
   }
 
   getId(): string {
-    return this.data.id;
+    return this.id;
   }
 
-  getCombinedEdgeCount(): number {
-    return this.data.combinedEdgeCount;
-  }
+
 
   setSource(source: ComponentNode): void {
-    this.data = {
-      ...this.data,
-      source,
-    };
+    this.source = source;
   }
 
   setTarget(target: ComponentNode): void {
-    this.data = {
-      ...this.data,
-      target,
-    };
+    this.target = target;
+  }
+
+
+  //08-14-2025, currently No Need
+  // copyEdge(): Edge {
+  //   const copy = new EdgeImpl(
+  //     { name: this.source.getName(), getComponent: () => this.source } as Port,
+  //     { name: this.target.getName(), getComponent: () => this.target } as Port
+  //   );
+  //   copy.setCombinedEdgeCount(this.combinedEdgeCount);
+  //   return copy;
+  // }
+}
+
+export class CombinedEdge extends EdgeImpl {
+  combinedEdgeCount: number;
+  SubSources: ComponentNode[];
+  SubTargets: ComponentNode[];
+
+  constructor(sourcePort: Port, targetPort: Port) {
+    super(sourcePort, targetPort);
+    this.combinedEdgeCount = 1;
+    this.SubSources = [];
+    this.SubTargets = [];
   }
 
   setCombinedEdgeCount(count: number): void {
-    this.data = {
-      ...this.data,
-      combinedEdgeCount: count,
-    };
+    this.combinedEdgeCount = count;
   }
 
-  copyEdge(): Edge {
-    const copy = new EdgeImpl(
-      { name: this.data.source.getName(), getComponent: () => this.data.source } as Port,
-      { name: this.data.target.getName(), getComponent: () => this.data.target } as Port
-    );
-    copy.setCombinedEdgeCount(this.data.combinedEdgeCount);
-    return copy;
+  getCombinedEdgeCount(): number {
+    return this.combinedEdgeCount;
   }
 }

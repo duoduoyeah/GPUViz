@@ -4,12 +4,11 @@ import type { GraphEdge } from "./cytoscapeGraph.type";
 
 // Edge is an itermediate representation of GraphEdge 
 export interface Edge {
-  data: {
-    readonly id: string;
-    source: ComponentNode;
-    target: ComponentNode;
-    combinedEdgeCount: number;
-  };
+
+  readonly id: string;
+  source: ComponentNode;
+  target: ComponentNode;
+
 
   getGraphEdge(): GraphEdge;
   getSource(): ComponentNode;
@@ -17,10 +16,7 @@ export interface Edge {
   getSourceName(): string;
   getTargetName(): string;
   getId(): string;
-  getCombinedEdgeCount(): number;
 
   setSource(source: ComponentNode): void;
   setTarget(target: ComponentNode): void;
-  setCombinedEdgeCount(count: number): void;
-  copyEdge(): Edge;
 }

@@ -56,6 +56,18 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
       selectNode(nodeData.id);
     });
 
+    // Handle node hover (mouseover)
+    graphEventsRef.current.on("nodeHover", (nodeData: any) => {
+      console.log("GraphCanvas: Node hovered:", nodeData);
+      selectNode(nodeData.id);
+    });
+
+    // Handle node unhover (mouseout)
+    graphEventsRef.current.on("nodeUnhover", (nodeData: any) => {
+      console.log("GraphCanvas: Node unhovered:", nodeData);
+      // Clear selection to hide the info panel when mouse leaves the node
+    });
+
     // Handle canvas clicks (deselect)
     graphEventsRef.current.on("canvasClick", () => {
       console.log("GraphCanvas: Canvas clicked");
@@ -81,6 +93,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     graphEventsRef.current.on("nodeDoubleClick", (nodeData: any) => {
       console.log("GraphCanvas: Node double-clicked:", nodeData);
       // Call the new selectComponent method from the store
+      selectNode(null);
       selectComponent(nodeData.id);
     });
   }, [selectNode, selectComponent]);

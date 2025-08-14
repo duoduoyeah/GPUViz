@@ -2,6 +2,13 @@
 
 
 ---
+08-14
+1. create combined component, port and edge.
+
+currently working on CombinedEdge,
+need a method to add each sub Edge into it.
+
+---
 08-12
 ## click to display node info
 
@@ -9,7 +16,6 @@ in cytoscapeGraph, I want to do this:
 1. for each/all some component, I will add a type to it.
 2. when many same-type components show in the graph, they will
 range(排列) in a more organized way.
-
 
 
 ---

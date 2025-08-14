@@ -1,8 +1,7 @@
 import type {
-  ComponentNode,
   Edge
 } from "../../types";
-import { EdgeImpl } from "./edge";
+
 
 export class EdgeTypeMap {
   private edgeTypeMap: Record<string, Edge[]> = {};

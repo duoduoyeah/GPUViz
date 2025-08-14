@@ -1,4 +1,4 @@
-import type { ComponentNode, Port } from "../types/index";
+import type { ComponentNode, Port } from "../../types";
 
 export class PortImpl implements Port {
   readonly name: string;
@@ -27,5 +27,26 @@ export class PortImpl implements Port {
 
   getComponent(): ComponentNode {
     return this.owner;
+  }
+}
+
+export class CombinedPort extends PortImpl {
+  subPorts: Port[];
+
+  constructor(name: string) {
+    super(name);
+    this.subPorts = [];
+  }
+
+  setSubPorts(ports: Port[]): void {
+    this.subPorts = ports;
+  }
+
+  addSubPort(port: Port): void {
+    this.subPorts.push(port);
+  }
+
+  getSubPorts(): Port[] {
+    return this.subPorts;
   }
 }

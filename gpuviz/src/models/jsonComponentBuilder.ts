@@ -7,7 +7,7 @@ import type {
   JsonPort,
 } from "../types";
 import { ComponentNodeImpl } from "./component/componentNode";
-import { PortImpl } from "./port";
+import { PortImpl } from "./port/port";
 
 // Component Node Builder
 export class ComponentNodeBuilder {

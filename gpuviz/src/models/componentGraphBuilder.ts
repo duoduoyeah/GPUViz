@@ -166,15 +166,15 @@ export class ComponentGraphExtractor {
     return this.edgeTypeMap;
   }
 
-
-  copyGraph(): ComponentGraph {
-    const copiedEdges = this.graph.edges.map(edge => edge.copyEdge());
+  //08-14-2025, currently No Need
+  // copyGraph(): ComponentGraph {
+  //   const copiedEdges = this.graph.edges.map(edge => edge.copyEdge());
     
-    return {
-      components: this.graph.components, // Reuse original components
-      edges: copiedEdges // Use copied edges
-    };
-  }
+  //   return {
+  //     components: this.graph.components, // Reuse original components
+  //     edges: copiedEdges // Use copied edges
+  //   };
+  // }
 
   @validateComponentGraph
   consolidateGraph(): ComponentGraph {

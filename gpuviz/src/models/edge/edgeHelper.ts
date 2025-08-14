@@ -1,6 +1,5 @@
-import type { Port, GraphEdge, Edge, ComponentNode } from "../../types/index";
-import { EdgeImpl } from "./edge";
-
+import type { GraphEdge, Edge, ComponentNode } from "../../types/index";
+import {EdgeBuilder} from "./edgeBuilder"
 /**
  * Interface defining edge helper methods for graph operations
  */
@@ -9,26 +8,6 @@ export interface EdgeHelper {
    * Convert Edge array to GraphEdge array
    */
   buildGraphEdges(edges: Edge[]): GraphEdge[];
-
-  /**
-   * Get outgoing edges from a port
-   */
-  getOutgoingEdgesFromPort(port: Port): Edge[];
-
-  /**
-   * Get incoming edges to a port
-   */
-  getIncomingEdgesFromPort(port: Port): Edge[];
-
-  /**
-   * Get all edges (both incoming and outgoing) connected to a port
-   */
-  getEdgesFromPort(port: Port): Edge[];
-
-  /**
-   * Get all edges connected to a component's ports
-   */
-  getEdgesFromComponent(component: ComponentNode): Edge[];
 
   /**
    * Filter edges to remove duplicates and validate uniqueness
@@ -53,12 +32,13 @@ export interface EdgeHelper {
  * Interface extending EdgeHelper with component graph specific operations
  */
 export interface ComponentGraphEdgeHelper extends EdgeHelper {
-
-
+  /**
+   * Collect all edges from a specific node and its descendants recursively
+   */
   collectEdgesFromNode(root: ComponentNode): Edge[];
 
   /**
-   *  adjust edges for a specific set of nodes
+   * Adjust edges for a specific set of nodes
    */
   AdjustEdges(
     edges: Edge[],
@@ -75,102 +55,61 @@ export interface ComponentGraphEdgeHelper extends EdgeHelper {
   ): void;
 }
 
-export function getOutgoingEdgesFromPort(port: Port): Edge[] {
-  const edges: Edge[] = [];
-
-  // Create edges from this port to all outgoing ports
-  for (const targetPort of port.outgoingPort) {
-    // Create the edge with source port, target port, and their respective components
-    const edge = new EdgeImpl(port, targetPort);
-
-    edges.push(edge);
+/**
+ * Base implementation of the EdgeHelper interface
+ */
+class EdgeHelperImpl implements EdgeHelper {
+  buildGraphEdges(edges: Edge[]): GraphEdge[] {
+    return edges.map((edge) => edge.getGraphEdge());
   }
 
-  return edges;
-}
 
-export function getIncomingEdgesFromPort(port: Port): Edge[] {
-  const edges: Edge[] = [];
-
-  // Create edges from all incoming ports to this port
-  for (const sourcePort of port.incomingPort) {
-    // Create the edge with source port, target port, and their respective components
-    const edge = new EdgeImpl(sourcePort, port);
-
-    edges.push(edge);
+  filterEdges(edges: Edge[]) {
+    // Remove duplicates
+    this.filterDuplicateEdges(edges);
   }
 
-  return edges;
-}
-
-export function getEdgesFromPort(port: Port): Edge[] {
-  // Combine both incoming and outgoing edges
-  const incomingEdges = getIncomingEdgesFromPort(port);
-  const outgoingEdges = getOutgoingEdgesFromPort(port);
-
-  // Return the combined array of edges
-  return [...incomingEdges, ...outgoingEdges];
-}
-
-export function getEdgesFromComponent(component: ComponentNode): Edge[] {
-  const allEdges: Edge[] = [];
-
-  // Get edges from all ports in the component
-  const ports = component.getPorts();
-  for (const port of ports) {
-    const portEdges = getEdgesFromPort(port);
-    allEdges.push(...portEdges);
+  filterDuplicateEdges(edges: Edge[]) {
+    this.filterDuplicateEdgesbyID(edges);
+    this.filterDuplicateEdgesbySides(edges);
   }
-  return allEdges;
-}
 
-export function filterEdges(edges: Edge[]) {
-  // Remove duplicates
-  filterDuplicateEdges(edges)
-}
+  filterDuplicateEdgesbyID(edges: Edge[]) {
+    const uniqueEdges: Edge[] = [];
+    const edgeIds = new Set<string>();
 
-export function filterDuplicateEdges(edges: Edge[]) {
-  filterDuplicateEdgesbyID(edges);
-  filterDuplicateEdgesbySides(edges);
-}
+    for (const edge of edges) {
+      const edgeId = edge.getId();
 
-export function filterDuplicateEdgesbyID(edges: Edge[]) {
-  const uniqueEdges: Edge[] = [];
-  const edgeIds = new Set<string>();
-
-  for (const edge of edges) {
-    const edgeId = edge.getId();
-
-    if (!edgeIds.has(edgeId)) {
-      edgeIds.add(edgeId);
-      uniqueEdges.push(edge);
+      if (!edgeIds.has(edgeId)) {
+        edgeIds.add(edgeId);
+        uniqueEdges.push(edge);
+      }
     }
+
+    edges.length = 0;
+    edges.push(...uniqueEdges);
   }
 
-  edges.length = 0;
-  edges.push(...uniqueEdges);
-}
+  filterDuplicateEdgesbySides(edges: Edge[]) {
+    const uniqueEdges: Edge[] = [];
+    const connectionKeys = new Set<string>();
 
-export function filterDuplicateEdgesbySides(edges: Edge[]) {
-  const uniqueEdges: Edge[] = [];
-  const connectionKeys = new Set<string>();
+    for (const edge of edges) {
+      // Create a unique key based on source and target names
+      const connectionKey = `${edge.getSource().getName()}->${edge.getTarget().getName()}`;
 
-  for (const edge of edges) {
-    // Create a unique key based on source and target names
-    const connectionKey = `${edge.getSource().getName()}->${edge.getTarget().getName()}`;
-
-    if (!connectionKeys.has(connectionKey)) {
-      connectionKeys.add(connectionKey);
-      uniqueEdges.push(edge);
+      if (!connectionKeys.has(connectionKey)) {
+        connectionKeys.add(connectionKey);
+        uniqueEdges.push(edge);
+      }
     }
+
+    edges.length = 0;
+    edges.push(...uniqueEdges);
   }
 
-  edges.length = 0;
-  edges.push(...uniqueEdges);
-}
-
-
-export function pruneInvalidEdges(
+  pruneInvalidEdges(
     nodes: ComponentNode[],
     edges: Edge[],
   ) {
@@ -193,169 +132,151 @@ export function pruneInvalidEdges(
     edges.length = 0;
     edges.push(...validEdges);
   }
-   
-
-/**
- * Convert Edge array to GraphEdge array
- */
-export function buildGraphEdges(edges: Edge[]): GraphEdge[] {
-  return edges.map((edge) => edge.getGraphEdge());
 }
 
 /**
- * Singleton object implementing the EdgeHelper interface
+ * Extended implementation for ComponentGraphEdgeHelper
  */
-export const baseEdgeHelper: EdgeHelper = {
-  buildGraphEdges,
-  getOutgoingEdgesFromPort,
-  getIncomingEdgesFromPort,
-  getEdgesFromPort,
-  getEdgesFromComponent,
-  filterEdges,
-  filterDuplicateEdges,
-  pruneInvalidEdges,
-};
+class ComponentGraphEdgeHelperImpl extends EdgeHelperImpl implements ComponentGraphEdgeHelper {
+  /**
+   * Collect all edges from a specific node and its descendants recursively
+   *
+   * This function:
+   * 1. Collects edges from the current node's ports
+   * 2. Recursively collects edges from all children
+   * 3. Returns a deduplicated list of all edges
+   */
+  collectEdgesFromNode(node: ComponentNode): Edge[] {
+    const collectEdgesHelper = (currentNode: ComponentNode): Edge[] => {
+      // Get edges from the current node
+      const nodeEdges: Edge[] = EdgeBuilder.getEdgesFromComponent(currentNode);
 
+      if (currentNode.children && currentNode.children.length > 0) {
+        for (const child of currentNode.children) {
+          const childEdges = collectEdgesHelper(child);
+          nodeEdges.push(...childEdges);
+        }
+      }
 
-/**
- * Collect all edges from a specific node and its descendants recursively
- *
- * This function:
- * 1. Collects edges from the current node's ports
- * 2. Recursively collects edges from all children
- * 3. Returns a deduplicated list of all edges
- */
-export function collectEdgesFromNode(node: ComponentNode): Edge[] {
-  function collectEdgesHelper(currentNode: ComponentNode): Edge[] {
-    // Get edges from the current node
-    const nodeEdges: Edge[] = baseEdgeHelper.getEdgesFromComponent(currentNode);
+      return nodeEdges;
+    };
 
-    if (currentNode.children && currentNode.children.length > 0) {
-      for (const child of currentNode.children) {
-        const childEdges = collectEdgesHelper(child);
-        nodeEdges.push(...childEdges);
+    const allEdges = collectEdgesHelper(node);
+    // console.log("Collected edges from component:", allEdges, "Length:", allEdges.length);
+    this.filterEdges(allEdges);
+    // console.log("[After Filter] Collected edges from component:", allEdges, "Length:", allEdges.length);
+    return allEdges;
+  }
+
+  /**
+   * Filter and adjust edges for a specific set of nodes
+   */
+  AdjustEdges(
+    edges: Edge[],
+    nodesToInclude: ComponentNode[],
+    rootNode: ComponentNode,
+  ): void {
+    // Create a map for quick lookup of nodes
+    const nodeMap = new Map<string, ComponentNode>();
+    for (const node of nodesToInclude) {
+      nodeMap.set(node.getName(), node);
+    }
+
+    // Process each edge
+    for (const edge of edges) {
+      const sourceComponent = edge.getSource();
+      const targetComponent = edge.getTarget();
+
+      // Check source component
+      if (
+        rootNode.isAncestor(sourceComponent) &&
+        !nodeMap.has(sourceComponent.getName())
+      ) {
+        let closestAncestor = this.findClosestIncludedAncestor(
+          sourceComponent,
+          nodesToInclude,
+        );
+        if (closestAncestor) {
+          edge.setSource(closestAncestor);
+        }
+      }
+
+      // Check target component
+      if (
+        rootNode.isAncestor(targetComponent) &&
+        !nodeMap.has(targetComponent.getName())
+      ) {
+        let closestAncestor = this.findClosestIncludedAncestor(
+          targetComponent,
+          nodesToInclude,
+        );
+        if (closestAncestor) {
+          edge.setTarget(closestAncestor);
+        }
       }
     }
-
-    return nodeEdges;
+    
+    this.filterDuplicateEdges(edges);
   }
 
-  const allEdges = collectEdgesHelper(node);
-  // console.log("Collected edges from component:", allEdges, "Length:", allEdges.length);
-  filterEdges(allEdges);
-  // console.log("[After Filter] Collected edges from component:", allEdges, "Length:", allEdges.length);
-  return allEdges;
-}
-
-/**
- * Filter and adjust edges for a specific set of nodes
- */
-export function AdjustEdges(
-  edges: Edge[],
-  nodesToInclude: ComponentNode[],
-  rootNode: ComponentNode,
-): void {
-  // Create a map for quick lookup of nodes
-  const nodeMap = new Map<string, ComponentNode>();
-  for (const node of nodesToInclude) {
-    nodeMap.set(node.getName(), node);
+  /**
+   * Helper function to find the closest ancestor of a node that is included in the provided list
+   */
+  private findClosestIncludedAncestor(
+    node: ComponentNode,
+    includedNodes: ComponentNode[],
+  ): ComponentNode | undefined {
+    let current = node.getParent();
+    while (current) {
+      // Check if this ancestor is in the included nodes
+      if (includedNodes.some((n) => n.getName() === current?.getName())) {
+        return current;
+      }
+      current = current.getParent();
+    }
+    return undefined;
   }
 
-  // Process each edge
-  for (const edge of edges) {
-    const sourceComponent = edge.getSource();
-    const targetComponent = edge.getTarget();
+  /**
+   * Add missing nodes to the component list based on edge connections
+   *
+   * This function:
+   * 1. Identifies components mentioned in edges but not in the provided nodes
+   * 2. Adds those components to the nodesToInclude array
+   * 3. This ensures all endpoints of edges are represented in the displayed graph
+   */
+  addMissingNodesFromEdges(
+    edges: Edge[],
+    nodesToInclude: ComponentNode[],
+  ): void {
+    // Create a map of currently included nodes for quick lookup
+    const includedNodeMap = new Map<string, boolean>();
+    for (const node of nodesToInclude) {
+      includedNodeMap.set(node.getName(), true);
+    }
 
-    // Check source component
-    if (
-      rootNode.isAncestor(sourceComponent) &&
-      !nodeMap.has(sourceComponent.getName())
-    ) {
-      let closestAncestor = findClosestIncludedAncestor(
-        sourceComponent,
-        nodesToInclude,
-      );
-      if (closestAncestor) {
-        edge.setSource(closestAncestor);
+    // Examine all edges and add missing nodes
+    for (const edge of edges) {
+      const sourceComponent = edge.getSource();
+      const targetComponent = edge.getTarget();
+
+      // Add source component if not already included
+      if (!includedNodeMap.has(sourceComponent.getName())) {
+        nodesToInclude.push(sourceComponent);
+        includedNodeMap.set(sourceComponent.getName(), true);
+      }
+
+      // Add target component if not already included
+      if (!includedNodeMap.has(targetComponent.getName())) {
+        nodesToInclude.push(targetComponent);
+        includedNodeMap.set(targetComponent.getName(), true);
       }
     }
-
-    // Check target component
-    if (
-      rootNode.isAncestor(targetComponent) &&
-      !nodeMap.has(targetComponent.getName())
-    ) {
-      let closestAncestor = findClosestIncludedAncestor(
-        targetComponent,
-        nodesToInclude,
-      );
-      if (closestAncestor) {
-        edge.setTarget(closestAncestor);
-      }
-    }
   }
-  
-  filterDuplicateEdges(edges);
 }
 
 /**
- * Helper function to find the closest ancestor of a node that is included in the provided list
+ * Singleton objects for edge helper implementations
  */
-function findClosestIncludedAncestor(
-  node: ComponentNode,
-  includedNodes: ComponentNode[],
-): ComponentNode | undefined {
-  let current = node.getParent();
-  while (current) {
-    // Check if this ancestor is in the included nodes
-    if (includedNodes.some((n) => n.getName() === current?.getName())) {
-      return current;
-    }
-    current = current.getParent();
-  }
-  return undefined;
-}
-
-/**
- * Add missing nodes to the component list based on edge connections
- *
- * This function:
- * 1. Identifies components mentioned in edges but not in the provided nodes
- * 2. Adds those components to the nodesToInclude array
- * 3. This ensures all endpoints of edges are represented in the displayed graph
- */
-export function addMissingNodesFromEdges(
-  edges: Edge[],
-  nodesToInclude: ComponentNode[],
-): void {
-  // Create a map of currently included nodes for quick lookup
-  const includedNodeMap = new Map<string, boolean>();
-  for (const node of nodesToInclude) {
-    includedNodeMap.set(node.getName(), true);
-  }
-
-  // Examine all edges and add missing nodes
-  for (const edge of edges) {
-    const sourceComponent = edge.getSource();
-    const targetComponent = edge.getTarget();
-
-    // Add source component if not already included
-    if (!includedNodeMap.has(sourceComponent.getName())) {
-      nodesToInclude.push(sourceComponent);
-      includedNodeMap.set(sourceComponent.getName(), true);
-    }
-
-    // Add target component if not already included
-    if (!includedNodeMap.has(targetComponent.getName())) {
-      nodesToInclude.push(targetComponent);
-      includedNodeMap.set(targetComponent.getName(), true);
-    }
-  }
-}
-
-export const componentGraphEdgeHelper: ComponentGraphEdgeHelper = {
-  ...baseEdgeHelper,
-  collectEdgesFromNode,
-  AdjustEdges,
-  addMissingNodesFromEdges,
-};
+export const baseEdgeHelper: EdgeHelper = new EdgeHelperImpl();
+export const componentGraphEdgeHelper: ComponentGraphEdgeHelper = new ComponentGraphEdgeHelperImpl();

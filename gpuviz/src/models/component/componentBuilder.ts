@@ -6,10 +6,6 @@ export function combineComponents(components: ComponentNode[]): ComponentNode {
         throw new Error("Cannot combine empty components array");
     }
     
-    if (components.length === 1) {
-        return components[0];
-    }
-    
     // Create a new component with a combined name
     // For names like "GPU[1].SA[9]", we want "GPU[1].SA[Combined]"
     let combinedName = "";
