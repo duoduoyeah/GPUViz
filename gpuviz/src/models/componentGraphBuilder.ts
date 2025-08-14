@@ -1,11 +1,16 @@
 import type {
   ComponentNode,
-  Edge
+  Edge,
+  Port
 } from "../types";
 import { ComponentTree } from "./componentTree";
 import { componentGraphEdgeHelper as edgeHelper } from "./edge/edgeHelper";
 import { componentHelper } from "./component/componentHelper";
 import { EdgeTypeMap } from "./edge/edgeTypeMap";
+import { ComponentBuilder } from "./component/componentBuilder";
+import {PortBuilder} from "./port/portBuilder"
+import { CombinedPort } from "./port/port";
+import { EdgeBuilder } from "./edge/edgeBuilder"
 
 // Define the ComponentGraph type
 export type ComponentGraph = {
@@ -183,13 +188,29 @@ export class ComponentGraphExtractor {
       edges: []
     };
 
+    // create new components
+    for (const type in this.componentTypeMap) {
+      const components = this.componentTypeMap[type];
+      if (components.length === 0) continue;
+      const combinedComponent = ComponentBuilder.combineComponents(components);
+      tidyGraph.components.push(combinedComponent);
+    }
     
-    const currentType: Set<string> = new Set();
-    const currentComponents: Set<string> = new Set();
-    const currentEdges: Set<string> = new Set();
-
+    // create new ports for each combined component
+    for (const component of tidyGraph.components) {
+      const combinedPorts = PortBuilder.generateCombinedPorts(component);
+      component.setPorts(combinedPorts);
+    }
+    
+    // connect new ports with each other
+    
+    // create new edges
+    for (const component of tidyGraph.components) {
+      const edges = EdgeBuilder.getEdgesFromComponent(component);
+      tidyGraph.edges.push(...edges);
+    }
+    
 
     return tidyGraph;
   }
-
-}
+} 

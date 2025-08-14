@@ -14,6 +14,10 @@ export class EdgeBuilder {
   }
 
 
+  public static createCombinedEdge() {
+    
+  }
+
   public static createComponentEdge(source: ComponentNode, target: ComponentNode): Edge {
     // Create temporary ports for component connections
     const sourcePort = { 

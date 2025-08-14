@@ -75,8 +75,8 @@ export class EdgeImpl implements Edge {
 
 export class CombinedEdge extends EdgeImpl {
   combinedEdgeCount: number;
-  SubSources: ComponentNode[];
-  SubTargets: ComponentNode[];
+  SubSources: ComponentNode[]; //Not Yet Implement
+  SubTargets: ComponentNode[]; //Not Yet Implement
 
   constructor(sourcePort: Port, targetPort: Port) {
     super(sourcePort, targetPort);

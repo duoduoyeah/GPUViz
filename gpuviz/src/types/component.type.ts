@@ -2,6 +2,7 @@ export type ComponentKind = "square" | "rectangleBar" | undefined;
 
 export interface Port {
   name: string;
+  type: string;
   incomingPort: Port[];
   outgoingPort: Port[];
   owner: ComponentNode;
@@ -10,6 +11,8 @@ export interface Port {
   setIncomingPorts(ports: Port[]): void;
   setOutgoingPorts(ports: Port[]): void;
   getComponent(): ComponentNode;
+  getType(): string;
+  getName(): string;
 }
 
 export interface NodeInfo {}
