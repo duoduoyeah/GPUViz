@@ -10,6 +10,7 @@ import { EdgeTypeMap } from "./edge/edgeTypeMap";
 import { ComponentBuilder } from "./component/componentBuilder";
 import {PortBuilder} from "./port/portBuilder"
 import { CombinedPort } from "./port/port";
+import { PortHelper } from "./port/portHelper";
 import { EdgeBuilder } from "./edge/edgeBuilder"
 
 // Define the ComponentGraph type
@@ -44,6 +45,7 @@ export function validateComponentGraph(
 
 // Rename class to ComponentGraphExtractor which better reflects what it does
 export class ComponentGraphExtractor {
+
   private tree: ComponentTree;
   private graph: ComponentGraph;
   private componentTypeMap: Record<string, ComponentNode[]>;
@@ -97,13 +99,12 @@ export class ComponentGraphExtractor {
   appendComponent(
     componentId: string,
     childrenLevel: number = 1,
-  ): ComponentGraph | null {
+  ): ComponentGraph {
     // Find the component node by ID
     const rootNode = this.tree.findNodeByName(componentId);
 
     if (!rootNode) {
-      console.warn(`Component with ID ${componentId} not found`);
-      return null;
+      throw new Error(`Component with ID ${componentId} not found`);
     }
 
     //Get all edges from component
@@ -203,14 +204,30 @@ export class ComponentGraphExtractor {
     }
     
     // connect new ports with each other
+    // For each combined port, set incomingPort and outgoingPort to other CombinedPorts whose owners are the new combined components
+    const combinedComponentsSet = new Set(tidyGraph.components);
+    for (const component of tidyGraph.components) {
+      const ports = component.getPorts();
+      for (const port of ports) {
+        if (port instanceof CombinedPort) {
+          const subPorts = port.getSubPorts();
+          const incoming = PortHelper.collectCombinedPorts(subPorts, 'incomingPort', combinedComponentsSet);
+          const outgoing = PortHelper.collectCombinedPorts(subPorts, 'outgoingPort', combinedComponentsSet);
+          port.setIncomingPorts(incoming);
+          port.setOutgoingPorts(outgoing);
+        }
+      }
+    }
     
     // create new edges
     for (const component of tidyGraph.components) {
       const edges = EdgeBuilder.getEdgesFromComponent(component);
       tidyGraph.edges.push(...edges);
     }
-    
 
     return tidyGraph;
   }
+
+
+  // collectCombinedPorts moved to portHelper
 } 

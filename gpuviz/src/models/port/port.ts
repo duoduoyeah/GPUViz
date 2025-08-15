@@ -4,6 +4,7 @@ export class PortImpl implements Port {
   readonly name: string;
   readonly type: string;
 
+  combinePort: Port;
   incomingPort: Port[];
   outgoingPort: Port[];
   owner: ComponentNode;
@@ -14,6 +15,7 @@ export class PortImpl implements Port {
     this.incomingPort = [];
     this.outgoingPort = [];
     this.owner = {} as ComponentNode; // Temporary placeholder
+    this.combinePort = {} as Port;
   }
 
   private setType(name: string): string {
@@ -31,6 +33,14 @@ export class PortImpl implements Port {
 
   setOutgoingPorts(ports: Port[]): void {
     this.outgoingPort = ports;
+  }
+
+  setCombinePort(port: Port): void {
+    this.combinePort = port;
+  }
+
+  getCombinePort(): Port {
+    return this.combinePort;
   }
 
   getComponent(): ComponentNode {
@@ -68,5 +78,12 @@ export class CombinedPort extends PortImpl {
 
   getSubPortCount(): number {
     return this.subPorts.length;
+  }
+
+  assignSubPorts(ports: Port[]): void {
+    this.subPorts = ports;
+    ports.forEach(port => {
+      port.setCombinePort(this);
+    });
   }
 }

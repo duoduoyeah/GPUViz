@@ -16,6 +16,7 @@ export class ComponentNodeImpl implements ComponentNode {
   type: string = "";
   shape: ComponentKind;
 
+  combinedComponent: ComponentNode | undefined;
   parent: ComponentNode | undefined;
   children: ComponentNode[] = [];
   subComponents: ComponentNode[] = [];
@@ -26,8 +27,11 @@ export class ComponentNodeImpl implements ComponentNode {
     this.name = name;
   }
 
-  setSubComponents(components: ComponentNode[]) {
+  assignSubComponents(components: ComponentNode[]) {
     this.subComponents = components;
+    components.forEach(component => {
+      component.setCombinedComponent(this);
+    });
   }
 
   setType(type: string): void {
@@ -47,12 +51,20 @@ export class ComponentNodeImpl implements ComponentNode {
     this.shape = "square";
   }
 
-  public setParent(parent: ComponentNode): void {
+  setParent(parent: ComponentNode): void {
     this.parent = parent;
   }
 
   setChildren(children: ComponentNode[]): void {
     this.children = children;
+  }
+
+  setCombinedComponent(component: ComponentNode | undefined): void {
+    this.combinedComponent = component;
+  }
+
+  getCombinedComponent(): ComponentNode | undefined {
+    return this.combinedComponent;
   }
 
   getName(): string {

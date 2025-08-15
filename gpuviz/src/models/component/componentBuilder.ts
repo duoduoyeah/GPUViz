@@ -58,7 +58,7 @@ export class ComponentBuilder {
         combined.setShape();
         
         // Set Subcomponents
-        combined.setSubComponents(components);
+        combined.assignSubComponents(components);
 
         // TODO in Future: NodeInfo is used.
         const mergedInfo: NodeInfo = {};

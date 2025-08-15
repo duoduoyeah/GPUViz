@@ -145,7 +145,7 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
 
   // Handle component selection for graph updates (e.g., on double-click)
   selectComponent: (componentId: string) => {
-    const { cytoscapeGraphBuilder } = get();
+    const { cytoscapeGraphBuilder, modifyGraph } = get();
     
     if (!cytoscapeGraphBuilder) {
       console.warn("Cannot select component: cytoscapeGraph is null");
@@ -154,8 +154,13 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
     
     // Use the doubleClickComponent method to get the new graph
     const newGraph = cytoscapeGraphBuilder.selectComponent(componentId);
-    
     set({ currentGraph: newGraph });
+    
+    if (typeof modifyGraph === "function") {
+      modifyGraph("tidy");
+    }
+
+    console.log("Current graph after selectComponent:", get().currentGraph);
   },
 
   modifyGraph: (type: "all" | "tidy") => {

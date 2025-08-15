@@ -1,5 +1,7 @@
 
+## TODO
 
+* the display has some problem, check the fit method
 
 ---
 08-14

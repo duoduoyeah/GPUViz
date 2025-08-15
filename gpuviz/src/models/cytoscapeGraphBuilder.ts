@@ -6,9 +6,38 @@ import type { ComponentGraph } from "./componentGraphBuilder";
 /**
  * CytoscapeGraph class to build and manage cytoscape graph representations
  */
+function safeGraphReturn(
+  fn: () => ComponentGraph | undefined,
+  builder: CytoscapeGraphBuilder,
+  updateComponentGraph = true
+): CytoscapeGraph {
+  try {
+    const componentGraph = fn();
+    if (!componentGraph) {
+      return { nodes: [], edges: [] };
+    }
+    return builder.buildCyGraph(componentGraph, updateComponentGraph);
+  } catch (e) {
+    console.error(e);
+    // Return a single node with no edges, following the GraphNode interface
+    return {
+      nodes: [
+        {
+          data: {
+            id: "error-node",
+            label: "Error",
+            shape: "square",
+            type: "error"
+          }
+        }
+      ],
+      edges: []
+    };
+  }
+}
+
 export class CytoscapeGraphBuilder {
   private graphExtractor: ComponentGraphExtractor;
-
 
   constructor(graphExtractor: ComponentGraphExtractor) {
     this.graphExtractor = graphExtractor;
@@ -28,27 +57,32 @@ export class CytoscapeGraphBuilder {
   }
 
   createGraphAtLevel(level: number): CytoscapeGraph {
-    return this.buildCyGraph(this.graphExtractor.createGraphAtLevel(level));
+    return safeGraphReturn(
+      () => this.graphExtractor.createGraphAtLevel(level),
+      this
+    );
   }
 
   selectComponent(componentId: string): CytoscapeGraph {
-    const componentGraph = this.graphExtractor.appendComponent(componentId);
-    if (!componentGraph) {
-      return {
-        nodes: [],
-        edges: []
-      };
-    }
-    return this.buildCyGraph(componentGraph);
+    return safeGraphReturn(
+      () => this.graphExtractor.appendComponent(componentId),
+      this
+    );
   }
 
-
   tidyGraph(): CytoscapeGraph {
-    const componentGraph = this.graphExtractor.consolidateGraph();
-    return this.buildCyGraph(componentGraph, false);
+    return safeGraphReturn(
+      () => this.graphExtractor.consolidateGraph(),
+      this,
+      false
+    );
   }
 
   completeGraph(): CytoscapeGraph {
-    return this.buildCyGraph(this.graphExtractor.getGraph(), false);
+    return safeGraphReturn(
+      () => this.graphExtractor.getGraph(),
+      this,
+      false
+    );
   }
 }

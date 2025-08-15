@@ -32,8 +32,8 @@ export const DEFAULT_CYTOSCAPE_STYLES = [
       label: "data(label)",
       "text-valign": "center" as const,
       "text-halign": "center" as const,
-      color: "#fff",
-      "font-size": "10px", // Reduced from 12px for better fit
+      color: "#222", 
+      "font-size": "12px",
       "font-weight": "bold" as const, // Fixed type compatibility
       width: `${GRAPH_CONFIG.DEFAULT_NODE_WIDTH}px`,
       height: `${GRAPH_CONFIG.DEFAULT_NODE_HEIGHT}px`,
@@ -114,13 +114,13 @@ export const LAYOUT_PRESETS = {
 export type LayoutType = keyof typeof LAYOUT_PRESETS;
 
 // Component shape mappings
-export const COMPONENT_SHAPES = {
-  GPU: "rectangle",
-  Memory: "round-rectangle",
-  Core: "ellipse",
-  Cache: "triangle",
-  default: "rectangle",
-} as const;
+// export const COMPONENT_SHAPES = {
+//   GPU: "rectangle",
+//   Memory: "round-rectangle",
+//   Core: "ellipse",
+//   Cache: "triangle",
+//   default: "rectangle",
+// } as const;
 
 // Default graph options
 export const DEFAULT_GRAPH_OPTIONS = {

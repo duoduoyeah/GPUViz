@@ -3,10 +3,12 @@ import type { CytoscapeGraph } from "../../types";
 import { DEFAULT_GRAPH_OPTIONS, LAYOUT_PRESETS } from "./GraphConfig";
 import type { LayoutType } from "./GraphConfig";
 
+type graphLayout =  "dagre" | "cose" | "grid";
+
 export class GraphCore {
   private container: HTMLDivElement | null = null;
   private cy: cytoscape.Core | null = null;
-  private layout: LayoutType = "grid";
+  private layout: LayoutType = "hierarchical";
 
   init(container: HTMLDivElement): void {
     if (this.cy && this.container === container) return;
@@ -40,12 +42,6 @@ export class GraphCore {
     ];
 
     this.cy.add(elements);
-
-    // Commented out on 2025-08-05 — remove later if no issues arise.
-    // this.cy.batch(() => {
-    //   this.cy!.add(elements);
-    // });
-    // ==========================================================
 
     this.applyLayout(this.layout);
   }
