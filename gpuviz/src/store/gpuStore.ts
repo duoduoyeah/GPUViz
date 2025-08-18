@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { ComponentTree } from "../models/componentTree";
 import { ComponentGraphExtractor } from "../models/componentGraphBuilder";
 import {CytoscapeGraphBuilder} from "../models/cytoscapeGraphBuilder"
-import { ComponentNodeBuilder } from "../models/jsonComponentBuilder";
+import { ComponentNodeBuilder } from "../models/json/jsonComponentBuilder";
 import type { NodeInfo, CytoscapeGraph } from "../types";
 
 // Define the store state interface

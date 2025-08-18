@@ -2,6 +2,13 @@
 ## TODO
 
 * the display has some problem, check the fit method
+-> the width got when impl layout is wrong.
+
+---
+08-18
+1. start from CU, if touch stuff not in SA, then can not be back again, and continue,
+2. give the components in the chain, the position.
+
 
 ---
 08-14

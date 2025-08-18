@@ -8,7 +8,7 @@ type graphLayout =  "dagre" | "cose" | "grid";
 export class GraphCore {
   private container: HTMLDivElement | null = null;
   private cy: cytoscape.Core | null = null;
-  private layout: LayoutType = "hierarchical";
+  private layout: LayoutType = "grid";
 
   init(container: HTMLDivElement): void {
     if (this.cy && this.container === container) return;
