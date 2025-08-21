@@ -4,6 +4,11 @@
 * the display has some problem, check the fit method
 -> the width got when impl layout is wrong.
 
+--
+08-21
+1.  debug the width problem when layout
+ -> I guess the canvas width do not consider the panel at the left, thats why it is a little bit wider
+ than the best width.
 ---
 08-18
 1. start from CU, if touch stuff not in SA, then can not be back again, and continue,

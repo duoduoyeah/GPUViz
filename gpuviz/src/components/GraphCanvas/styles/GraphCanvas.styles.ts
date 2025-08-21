@@ -3,8 +3,10 @@ import type { CSSProperties } from "react";
 export const styles = {
   container: {
     position: "relative",
-    width: "100%",
-    height: "100%",
+    width: "100vw",
+    height: "100vh",
+    maxWidth: "100vw",
+    maxHeight: "100vh",
     backgroundColor: "#f9f9f9",
     overflow: "hidden",
   } as CSSProperties,
@@ -12,8 +14,11 @@ export const styles = {
   graphContainer: {
     width: "100%",
     height: "100%",
+    maxWidth: "100vw",
+    maxHeight: "100vh",
     backgroundColor: "#ffffff",
     border: "1px solid #e0e0e0",
+    // boxSizing: "border-box",
   } as CSSProperties,
 
   loadingContainer: {
