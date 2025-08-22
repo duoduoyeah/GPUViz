@@ -7,14 +7,14 @@ export class PortImpl implements Port {
   combinePort: Port;
   incomingPort: Port[];
   outgoingPort: Port[];
-  owner: ComponentNode;
+  owner: ComponentNode | undefined;
 
   constructor(name: string) {
     this.name = name;
     this.type = this.setType(name); 
     this.incomingPort = [];
     this.outgoingPort = [];
-    this.owner = {} as ComponentNode; // Temporary placeholder
+  this.owner = undefined;
     this.combinePort = {} as Port;
   }
 
@@ -35,6 +35,20 @@ export class PortImpl implements Port {
     this.outgoingPort = ports;
   }
 
+  addIncomingPort(port: Port): void {
+    if (this.incomingPort.includes(port)) {
+      return;
+    }
+    this.incomingPort.push(port);
+  }
+
+  addOutgoingPort(port: Port): void {
+    if (this.outgoingPort.includes(port)) {
+      return;
+    }
+    this.outgoingPort.push(port);
+  }
+
   setCombinePort(port: Port): void {
     this.combinePort = port;
   }
@@ -44,6 +58,10 @@ export class PortImpl implements Port {
   }
 
   getComponent(): ComponentNode {
+    if (!this.owner) {
+      console.error("Error: Port owner is missing or is an empty object.");
+      return {} as ComponentNode;
+    }
     return this.owner;
   }
 
@@ -53,6 +71,16 @@ export class PortImpl implements Port {
 
   getName(): string {
     return this.name;
+  }
+
+  validatePort(): [boolean, string] {
+    if (!this.name || this.name.trim() === "") {
+      return [false, "Port name is missing"];
+    }
+    if (!this.owner || Object.keys(this.owner).length === 0) {
+      return [false, "Port owner is missing"];
+    }
+    return [true, ""];
   }
 }
 

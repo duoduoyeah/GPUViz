@@ -22,7 +22,7 @@ export class ComponentNodeBuilder {
    * Build component tree from JSON data
    * @returns Array of root ComponentNode objects
    */
-  buildFromJson(jsonData: JsonData): ComponentNode[] {
+  public buildFromJson(jsonData: JsonData): ComponentNode[] {
     const validationError = this.validateJsonData(jsonData);
     if (validationError) {
       throw new Error(validationError);
@@ -58,6 +58,7 @@ export class ComponentNodeBuilder {
     );
   }
 
+  // ---------- Private Methods ----------
   private initializeComponent(jsonComponent: JsonComponent): ComponentNode {
     const component = new ComponentNodeImpl(jsonComponent.name);
 

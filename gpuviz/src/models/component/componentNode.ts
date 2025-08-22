@@ -95,13 +95,17 @@ export class ComponentNodeImpl implements ComponentNode {
     return this.subComponents;
   }
 
-  // Method to add a child node
   addChild(child: ComponentNode): void {
+    if (this.children.includes(child)) {
+      return;
+    }
     this.children.push(child);
   }
 
-  // Method to add a port
   addPort(port: Port): void {
+    if (this.ports.includes(port)) {
+      return;
+    }
     this.ports.push(port);
   }
 
@@ -131,5 +135,18 @@ export class ComponentNodeImpl implements ComponentNode {
     }
     
     return this._isolated;
+  }
+
+  validateComponent(): boolean {
+  // Check name
+  if (!this.name || this.name.trim() === "") return false;
+
+  // Check info is not nil
+  if (!this.info) return false;
+
+  // Check shape is set
+  if (!this.shape) return false;
+
+  return true;
   }
 }

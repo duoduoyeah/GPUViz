@@ -5,13 +5,16 @@ export interface Port {
   type: string;
   incomingPort: Port[];
   outgoingPort: Port[];
-  owner: ComponentNode;
+  owner: ComponentNode | undefined;
   combinePort: Port;
 
   setOwner(owner: ComponentNode): void;
   setIncomingPorts(ports: Port[]): void;
   setOutgoingPorts(ports: Port[]): void;
   setCombinePort(port: Port): void;
+  addIncomingPort(port: Port): void;
+  addOutgoingPort(port: Port): void;
+
   getCombinePort(): Port;
   getComponent(): ComponentNode;
   getType(): string;
@@ -46,6 +49,7 @@ export interface ComponentNode {
   assignSubComponents(components: ComponentNode[]): void;
   setInfo(info: NodeInfo): void;
   setPorts(ports: Port[]): void;
+  addPort(port: Port): void;
   setShape(): void;
   addChild(child: ComponentNode): void;
   setCombinedComponent(component: ComponentNode | undefined): void;
@@ -53,4 +57,5 @@ export interface ComponentNode {
   //bool
   isAncestor(node: ComponentNode): boolean;
   isIsolated(): boolean;
+  validateComponent(): boolean;
 }
