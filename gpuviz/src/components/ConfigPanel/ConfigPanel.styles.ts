@@ -1,5 +1,7 @@
 import type { CSSProperties } from "react";
 
+export var CONFIG_PANEL_WIDTH = "250px";
+
 export const styles = {
   collapsedContainer: {
     width: "40px",
@@ -13,7 +15,7 @@ export const styles = {
   } as CSSProperties,
 
   mainContainer: {
-    width: "250px",
+    width: CONFIG_PANEL_WIDTH,
     height: "100vh",
     backgroundColor: "#ffffff",
     borderRight: "1px solid #ddd",

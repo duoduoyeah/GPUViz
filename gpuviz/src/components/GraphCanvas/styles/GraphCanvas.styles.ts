@@ -1,4 +1,7 @@
 import type { CSSProperties } from "react";
+import { CONFIG_PANEL_WIDTH } from "../../ConfigPanel/ConfigPanel.styles";
+
+var CONTAINER_WIDTH =  `calc(100vw - ${CONFIG_PANEL_WIDTH})`
 
 export const styles = {
   container: {
@@ -12,13 +15,13 @@ export const styles = {
   } as CSSProperties,
 
   graphContainer: {
-    width: "100%",
+    width: CONTAINER_WIDTH,
     height: "100%",
     maxWidth: "100vw",
     maxHeight: "100vh",
     backgroundColor: "#ffffff",
     border: "1px solid #e0e0e0",
-    // boxSizing: "border-box",
+    // boxSizing: "border-box", 
   } as CSSProperties,
 
   loadingContainer: {

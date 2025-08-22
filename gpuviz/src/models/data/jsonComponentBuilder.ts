@@ -193,14 +193,6 @@ export class ComponentNodeBuilder {
     }
   }
 
-  getComponent(name: string): ComponentNode | undefined {
-    return this.componentMap.get(name);
-  }
-
-  getAllComponents(): ComponentNode[] {
-    return Array.from(this.componentMap.values());
-  }
-
   getType(name: string) {
     const parts = name.split(".");
     if (parts.length === 0) return "";

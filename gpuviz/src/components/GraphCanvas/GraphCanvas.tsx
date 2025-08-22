@@ -10,7 +10,7 @@ import useGpuStore from "../../store/gpuStore";
 import { GraphCore } from "./GraphCore";
 import { GraphEvents } from "./GraphEvents";
 import { styles } from "./styles/GraphCanvas.styles";
-import type { LayoutType } from "./GraphConfig";
+import type { LayoutType } from "./styles/GraphConfig.style";
 import ErrorBoundary from "./ErrorBoundary";
 import InfoPanel from "./InfoPanel";
 import DebugPanel from "./DebugPanel";

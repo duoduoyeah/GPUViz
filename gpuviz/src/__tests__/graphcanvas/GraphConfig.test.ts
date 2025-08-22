@@ -4,7 +4,7 @@ import {
   LAYOUT_PRESETS,
   COMPONENT_SHAPES,
   DEFAULT_GRAPH_OPTIONS,
-} from "../../components/GraphCanvas/GraphConfig";
+} from "../../components/GraphCanvas/styles/GraphConfig.style";
 
 describe("GraphConfig", () => {
   // Test configuration constants

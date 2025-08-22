@@ -1,7 +1,7 @@
 import React from "react";
 import { debugPanelStyles } from "./styles/DebugPanel.styles";
 import type { Graph } from "../../types";
-import type { LayoutType } from "./GraphConfig";
+import type { LayoutType } from "./styles/GraphConfig.style";
 
 interface DebugPanelProps {
   isReady: boolean;

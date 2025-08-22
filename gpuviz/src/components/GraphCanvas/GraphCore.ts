@@ -1,9 +1,7 @@
 import cytoscape from "cytoscape";
 import type { CytoscapeGraph } from "../../types";
-import { DEFAULT_GRAPH_OPTIONS, LAYOUT_PRESETS } from "./GraphConfig";
-import type { LayoutType } from "./GraphConfig";
-
-type graphLayout =  "dagre" | "cose" | "grid";
+import { DEFAULT_GRAPH_OPTIONS, LAYOUT_PRESETS } from "./styles/GraphConfig.style";
+import type { LayoutType } from "./styles/GraphConfig.style";
 
 export class GraphCore {
   private container: HTMLDivElement | null = null;

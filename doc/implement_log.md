@@ -4,6 +4,11 @@
 * the display has some problem, check the fit method
 -> the width got when impl layout is wrong.
 
+---
+08-22
+1. Add a way to import sqlite file.
+
+
 --
 08-21
 1.  debug the width problem when layout
