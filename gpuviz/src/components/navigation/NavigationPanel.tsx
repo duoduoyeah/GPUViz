@@ -7,13 +7,23 @@ const NavigationPanel: React.FC = () => {
     <nav className="navigation-panel">
       <ul>
         <li>
-          <NavLink to="/" end activeClassName="active">Gpuviz</NavLink>
+          <NavLink
+            to="/"
+            end
+            className={({ isActive }) => isActive ? "active" : undefined}
+          >Gpuviz</NavLink>
         </li>
         <li>
-          <NavLink to="/daisen" activeClassName="active">Daisen</NavLink>
+          <NavLink
+            to="/daisen"
+            className={({ isActive }) => isActive ? "active" : undefined}
+          >Daisen</NavLink>
         </li>
         <li>
-          <NavLink to="/chainsight" activeClassName="active">ChainSight</NavLink>
+          <NavLink
+            to="/chainsight"
+            className={({ isActive }) => isActive ? "active" : undefined}
+          >ChainSight</NavLink>
         </li>
       </ul>
     </nav>
