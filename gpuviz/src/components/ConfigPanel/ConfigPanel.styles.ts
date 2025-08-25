@@ -57,6 +57,8 @@ export const styles = {
     padding: "4px",
     border: "1px solid #ccc",
     borderRadius: "4px",
+    marginBottom: "16px", // Add space below input
+    display: "block", // Ensure input is on its own line
   } as CSSProperties,
 
   filterButtonGroup: {
@@ -97,8 +99,8 @@ export const styles = {
   } as CSSProperties,
 
   submitButton: {
-    width: "100%",
-    padding: "10px",
+    width: "90%",
+    padding: "8px",
     backgroundColor: "#2196F3",
     color: "white",
     border: "none",
@@ -106,5 +108,7 @@ export const styles = {
     cursor: "pointer",
     fontSize: "16px",
     fontWeight: "bold",
+    marginTop: "8px", // Add space above button
+    display: "block", // Ensure button is on its own line
   } as CSSProperties,
 };

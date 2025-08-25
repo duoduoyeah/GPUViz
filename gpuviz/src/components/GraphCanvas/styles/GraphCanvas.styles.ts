@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
+
 import { CONFIG_PANEL_WIDTH } from "../../ConfigPanel/ConfigPanel.styles";
 
-var CONTAINER_WIDTH =  `calc(100vw - ${CONFIG_PANEL_WIDTH})`
+const NAV_PANEL_WIDTH = "120px"; // Sync with NavigationPanel.css :root --nav-panel-width
+const CONTAINER_WIDTH = `calc(100vw - ${CONFIG_PANEL_WIDTH} - ${NAV_PANEL_WIDTH})`;
 
 export const styles = {
   container: {

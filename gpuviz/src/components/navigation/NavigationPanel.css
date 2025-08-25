@@ -1,0 +1,36 @@
+
+:root {
+  --nav-panel-width: 120px;
+}
+
+.navigation-panel {
+  width: var(--nav-panel-width);
+  background: #222e3c;
+  color: #fff;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+}
+.navigation-panel ul {
+  list-style: none;
+  padding: 0;
+}
+.navigation-panel li {
+  margin-bottom: 1.5rem;
+}
+.navigation-panel a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+.navigation-panel a.active,
+.navigation-panel a:hover {
+  background: #3a4a5a;
+}
