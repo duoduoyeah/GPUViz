@@ -119,7 +119,7 @@ export class ComponentNodeBuilder {
         }
       }
 
-      // Step 5: (Optional) Validate connections
+      // Step 4: (Optional) Validate connections
       // TODO: Add validation logic here (duplicate/invalid connections)
     }
 
