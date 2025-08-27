@@ -20,3 +20,10 @@ export interface Edge {
   setSource(source: ComponentNode): void;
   setTarget(target: ComponentNode): void;
 }
+
+// Later will merged to Edge
+interface ExtendedEdge extends Edge {
+  weight: number;
+
+  getWeight(): number;
+}

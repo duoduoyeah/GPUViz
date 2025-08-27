@@ -4,3 +4,6 @@ export * from "./cytoscapeGraph.type";
 export * from "./json";
 export * from "./edge.type"
 export * from "./sqlite"
+export * from "./trafficAnalyzer.type"
+export * from "./chain.type"
+export * from "./message.type"

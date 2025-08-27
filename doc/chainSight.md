@@ -8,6 +8,9 @@ The core is CU, and around CU, has several Chains.
 Each chain has its own name.
 Chain has several edges, and each edge has many message information.
 
+## Simplify Implementation
+Only tackle one chain this week.
+
 ## Backend Data
 New interface:
 
@@ -38,7 +41,7 @@ SA level (more than 1)
 single (more than 1)
 
 option 2:
-chain (more than 1)
+chain (more than 1) -> we start from only one chain
 topology
 
 option 3:
