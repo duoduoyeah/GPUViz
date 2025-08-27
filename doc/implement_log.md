@@ -4,6 +4,13 @@
 * the display has some problem, check the fit method
 -> the width got when impl layout is wrong.
 
+
+---
+8.27
+1. test sqlite file import
+2. chainSight first design
+
+
 ---
 08-22
 1. Add a way to import sqlite file.
