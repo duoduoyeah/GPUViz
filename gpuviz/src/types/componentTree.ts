@@ -1,6 +1,6 @@
 import type { ComponentNode } from "./component.type";
 
-export interface Tree {
+export interface ComponentTree {
   root: ComponentNode;
   depth: number;
   levelMap: Map<number, ComponentNode[]>;

@@ -1,9 +1,8 @@
 import type {
   ComponentNode,
   Edge,
-  Port
+  ComponentTree
 } from "../types";
-import { ComponentTree } from "./componentTree";
 import { componentGraphEdgeHelper as edgeHelper } from "./edge/edgeHelper";
 import { componentHelper } from "./component/componentHelper";
 import { EdgeTypeMap } from "./edge/edgeTypeMap";

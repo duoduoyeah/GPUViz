@@ -1,5 +1,5 @@
 export * from "./component.type";
-export * from "./tree";
+export * from "./componentTree";
 export * from "./cytoscapeGraph.type";
 export * from "./json";
 export * from "./edge.type"

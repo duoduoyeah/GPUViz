@@ -7,6 +7,14 @@
 
 
 ---
+8.30
+1. File and string in input
+2. gpuStore, the messages related data
+3. the chainSight page, method to get the chain
+4. 
+
+
+---
 8.29
 1. create new page that configure the gpuviz
 2. finish the work rest before.

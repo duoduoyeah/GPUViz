@@ -1,7 +1,7 @@
-import type { ComponentNode, NodeInfo, Tree } from "../types";
+import type { ComponentNode, NodeInfo, ComponentTree } from "../types";
 import { ComponentNodeImpl } from "./component/componentNode";
 
-export class ComponentTree implements Tree {
+export class ComponentTreeImpl implements ComponentTree {
   root: ComponentNode;
   depth: number;
   levelMap: Map<number, ComponentNode[]>;

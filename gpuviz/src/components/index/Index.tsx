@@ -1,5 +1,7 @@
 import React from "react";
 import styles from "./Index.module.css";
+import SQLITE_PATH from "../../config/default"; 
+import { loadDataFromFile } from "./DataLoader";
 
 const Index: React.FC = () => {
   return (
@@ -19,6 +21,7 @@ const Index: React.FC = () => {
             if (file) {
               alert(`Selected file: ${file.name}`);
               // TODO: handle file upload/processing
+              loadDataFromFile(file);
             }
           }}
         />
@@ -30,6 +33,7 @@ const Index: React.FC = () => {
         className={styles["plain-button"]}
         onClick={() => {
           // TODO: use default file logic here
+          loadDataFromFile(SQLITE_PATH);
         }}
       >Use Default File</button>
     </div>
