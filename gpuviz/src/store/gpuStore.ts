@@ -2,13 +2,12 @@ import { create } from "zustand";
 import { ComponentTree } from "../models/componentTree";
 import { ComponentGraphExtractor } from "../models/componentGraphBuilder";
 import {CytoscapeGraphBuilder} from "../models/cytoscapeGraphBuilder"
-import { SqliteComponentNodeBuilder, ComponentNodeBuilder } from "../models/data";
-import type { NodeInfo, CytoscapeGraph } from "../types";
+import type {CytoscapeGraph } from "../types";
 
 // Define the store state interface
 interface GpuStoreState {
   // Data state
-  rawData: any | null;
+  componentTree: ComponentTree | null;
   cytoscapeGraphBuilder: CytoscapeGraphBuilder | null;
   currentGraph: CytoscapeGraph | null;
   activeLevel: number;
@@ -26,7 +25,7 @@ interface GpuStoreState {
   };
 
   // Actions
-  loadData: (data: any) => void;
+  loadTopology: (data: any) => void;
   setActiveLevel: (level: number) => void;
   selectNode: (nodeId: string | null) => void;
   setFilter: (filterType: string, value: any) => void;
@@ -38,7 +37,7 @@ interface GpuStoreState {
 // Create the store
 const useGpuStore = create<GpuStoreState>((set, get) => ({
   // Initial state
-  rawData: null,
+  componentTree: null,
   cytoscapeGraphBuilder: null,
   currentGraph: null,
   activeLevel: 1,
@@ -54,19 +53,19 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
   },
 
   // Actions
-  loadData: (data) => {
+  loadTopology: (componentTree) => {
     set({ loading: true, error: null });
 
     try {
       // Create a default NodeInfo object
-      const defaultInfo: NodeInfo = {};
+      // const defaultInfo: NodeInfo = {};
 
-      // Initialize the component node builder
-      const builder = new ComponentNodeBuilder(defaultInfo);
+      // // Initialize the component node builder
+      // const builder = new ComponentNodeBuilder(defaultInfo);
 
 
-      const rootComponents = builder.buildFromJson(data);
-      const componentTree = new ComponentTree(rootComponents);
+      // const rootComponents = builder.buildFromJson(data);
+      // const componentTree = new ComponentTree(rootComponents);
 
       const componentGraphExtractor = new ComponentGraphExtractor(componentTree);
 
@@ -77,7 +76,7 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
 
       // Update store with processed data
       set({
-        rawData: data,
+        componentTree: componentTree,
         cytoscapeGraphBuilder,
         currentGraph,
         loading: false,

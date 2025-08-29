@@ -3,29 +3,29 @@ import { AppLayout } from "../Layout/AppLayout";
 import { ConfigPanel } from "../ConfigPanel/ConfigPanel";
 import GraphCanvas, { type GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
 import useGpuStore from "../../store/gpuStore";
-import { DEFAULT_DATA_PATH } from "../../config/default";
+// import { DEFAULT_DATA_PATH } from "../../config/default"; //deprecate
 
 const gpuviz: React.FC = () => {
-	const { loadData, setActiveLevel, modifyGraph, loading, error, rawData } = useGpuStore();
+	const { setActiveLevel, modifyGraph, loading, error } = useGpuStore();
 	const graphCanvasRef = useRef<GraphCanvasHandles>(null);
 
-	useEffect(() => {
-		const loadDefaultData = async () => {
-			try {
-				const response = await fetch(DEFAULT_DATA_PATH);
-				if (!response.ok) {
-					throw new Error(`Failed to load data: ${response.statusText}`);
-				}
-				const jsonData = await response.json();
-				loadData(jsonData);
-			} catch (err) {
-				console.error("Error loading default data:", err);
-			}
-		};
-		if (!rawData && !loading && !error) {
-			loadDefaultData();
-		}
-	}, [loadData, rawData, loading, error]);
+	// useEffect(() => {
+	// 	const loadDefaultData = async () => {
+	// 		try {
+	// 			const response = await fetch(DEFAULT_DATA_PATH);
+	// 			if (!response.ok) {
+	// 				throw new Error(`Failed to load data: ${response.statusText}`);
+	// 			}
+	// 			const jsonData = await response.json();
+	// 			loadTopology(jsonData);
+	// 		} catch (err) {
+	// 			console.error("Error loading default data:", err);
+	// 		}
+	// 	};
+	// 	if (!componentTree && !loading && !error) {
+	// 		loadDefaultData();
+	// 	}
+	// }, [loadTopology, componentTree, loading, error]);
 
 	const handleConfigSubmit = (config: {
 		filter: "all" | "tidy";
@@ -41,10 +41,10 @@ const gpuviz: React.FC = () => {
 		setActiveLevel(level);
 	};
 
-	if (!rawData && loading && !error) {
+	if (loading && !error) {
 		return <div className="loading-container">Loading GPU visualization data...</div>;
 	}
-	if (error && !rawData) {
+	if (error) {
 		return (
 			<div className="error-container">
 				<div className="error-title">Failed to Load Data</div>

@@ -9,3 +9,13 @@ export interface PortConnectionEntry {
 	from_port: string; // corresponds to json:"from_port" akita_data:"index"
 	to_port: string;   // corresponds to json:"to_port" akita_data:"index"
 }
+
+export interface MessageEntry {
+	ID: string;
+	Source: string;
+	Destination: string;
+	EnqueueTime: number;
+	TransmitTime: number;
+	ReceiveTime: number;
+	DequeueTime: number;
+}

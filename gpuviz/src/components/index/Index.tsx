@@ -4,7 +4,7 @@ import styles from "./Index.module.css";
 const Index: React.FC = () => {
   return (
   <div className={styles["index-page"]}>
-    <h1>Import Data</h1>
+    <h1>Config</h1>
     <p>Start by importing your GPU visualization data file.</p>
     <p>Supported formats: <b>.json</b>, <b>.sqlite</b></p>
     <div style={{ margin: "16px 0" }}>

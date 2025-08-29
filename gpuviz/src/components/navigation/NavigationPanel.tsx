@@ -10,8 +10,13 @@ const NavigationPanel: React.FC = () => {
           <NavLink
             to="/"
             end
-            className={({ isActive }) => isActive ? "active" : undefined}
-          >Config</NavLink>
+            className={({ isActive }) =>
+              (isActive ? "active config-link" : "config-link")
+            }
+          >
+            <span role="img" aria-label="config" style={{ marginRight: 4 }}>⚙️</span>
+            Config
+          </NavLink>
         </li>
         <li>
           <NavLink

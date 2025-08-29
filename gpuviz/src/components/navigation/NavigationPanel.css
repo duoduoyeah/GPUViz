@@ -30,6 +30,11 @@
   border-radius: 4px;
   transition: background 0.2s;
 }
+
+.navigation-panel .config-link {
+  color: #90a4ae;
+  font-weight: 500;
+}
 .navigation-panel a.active,
 .navigation-panel a:hover {
   background: #3a4a5a;
