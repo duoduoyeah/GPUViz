@@ -1,11 +1,11 @@
 import React from "react";
 import { debugPanelStyles } from "./styles/DebugPanel.styles";
-import type { Graph } from "../../types";
+import type { CytoscapeGraph } from "../../types";
 import type { LayoutType } from "./styles/GraphConfig.style";
 
 interface DebugPanelProps {
   isReady: boolean;
-  currentGraph: Graph | null;
+  currentGraph: CytoscapeGraph | null;
   currentLayout: LayoutType;
   initSuccessful: boolean;
   error: string | null;
