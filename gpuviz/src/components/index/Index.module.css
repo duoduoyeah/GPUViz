@@ -1,0 +1,13 @@
+.index-page {
+  padding-left: 48px;
+}
+
+.plain-button {
+  padding: 6px 16px;
+  border: 1px solid #ccc;
+  background: #fafafa;
+  color: #222;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}

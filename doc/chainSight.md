@@ -10,6 +10,8 @@ Chain has several edges, and each edge has many message information.
 
 ## Simplify Implementation
 Only tackle one chain this week.
+No not tackle combine chain this week
+
 
 ## Backend Data
 New interface:
@@ -50,10 +52,23 @@ metrics
 option 4:
 workload amount 
 
+### How to combine Chain to Combined Chain
+
+1. Combined to SA level chain
+
+
+2. Combined to GPU level chain
+
+
 ## Right Display
 
 ## What data will be displayed
 Message has several time stamp, EnqueueTime, TransmitTime, ReceiveTime, and DequeueTime.
+
+### Send and Receive
+send number and receive number of each component.
+
+---
 
 ### 1. Network vs Processing Breakdown
 

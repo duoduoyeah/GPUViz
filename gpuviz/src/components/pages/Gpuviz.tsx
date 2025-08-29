@@ -5,7 +5,7 @@ import GraphCanvas, { type GraphCanvasHandles } from "../GraphCanvas/GraphCanvas
 import useGpuStore from "../../store/gpuStore";
 import { DEFAULT_DATA_PATH } from "../../config/default";
 
-const Gpuviz: React.FC = () => {
+const gpuviz: React.FC = () => {
 	const { loadData, setActiveLevel, modifyGraph, loading, error, rawData } = useGpuStore();
 	const graphCanvasRef = useRef<GraphCanvasHandles>(null);
 
@@ -68,4 +68,4 @@ const Gpuviz: React.FC = () => {
 	);
 };
 
-export default Gpuviz;
+export default gpuviz;

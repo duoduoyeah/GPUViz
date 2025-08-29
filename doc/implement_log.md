@@ -5,16 +5,24 @@
 -> the width got when impl layout is wrong.
 
 
+
+---
+8.29
+1. create new page that configure the gpuviz
+2. finish the work rest before.
+
 ---
 8.27
 1. test sqlite file import
-2. chainSight first design
+-> read sqlite file
+-> new page for setting the input file
 
+2. chainSight first design
+3. chainSight part, simplify to only one chain review.
 
 ---
 08-22
 1. Add a way to import sqlite file.
-
 
 --
 08-21

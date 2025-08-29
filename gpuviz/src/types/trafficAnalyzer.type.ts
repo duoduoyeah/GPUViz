@@ -1,24 +1,24 @@
-import type { message } from "./message.type";
+import type { Message } from "./message.type";
 
 export interface TrafficAnalyzer {
   // Compute preparation time (QueueWaitTime)
-  getQueueWaitTime(msg: message): number;
+  getQueueWaitTime(msg: Message): number;
 
   // Compute network time (NetworkTime)
-  getNetworkTime(msg: message): number;
+  getNetworkTime(msg: Message): number;
 
   // Compute processing time (ProcessingTime)
-  getProcessingTime(msg: message): number;
+  getProcessingTime(msg: Message): number;
 
   // Compute end-to-end time (EndToEndTime)
-  getEndToEndTime(msg: message): number;
+  getEndToEndTime(msg: Message): number;
 
   // Compute producer efficiency ratio
-  getProducerEfficiency(msg: message): number;
+  getProducerEfficiency(msg: Message): number;
 
   // Compute consumer efficiency ratio
-  getConsumerEfficiency(msg: message): number;
+  getConsumerEfficiency(msg: Message): number;
 
-  // Compute message rate for a set of messages in a time period
-  getMessageRate(messages: message[], timePeriod: number): number;
+  // Compute Message rate for a set of Messages in a time period
+  getMessageRate(Messages: Message[], timePeriod: number): number;
 }

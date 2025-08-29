@@ -11,6 +11,12 @@ const NavigationPanel: React.FC = () => {
             to="/"
             end
             className={({ isActive }) => isActive ? "active" : undefined}
+          >Config</NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/gpuviz"
+            className={({ isActive }) => isActive ? "active" : undefined}
           >Gpuviz</NavLink>
         </li>
         <li>

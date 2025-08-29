@@ -1,6 +1,6 @@
 import type { ComponentNode } from "./component.type";
 import type { GraphEdge } from "./cytoscapeGraph.type";
-
+import type {Message} from "./message.type"
 
 // Edge is an itermediate representation of GraphEdge 
 export interface Edge {
@@ -23,7 +23,10 @@ export interface Edge {
 
 // Later will merged to Edge
 interface ExtendedEdge extends Edge {
-  weight: number;
+  messages: Message[];
 
-  getWeight(): number;
+  getMessages(): number;
+
+  setMessages(messages: Message[]): void;
+  pushMessage(message: Message): void;
 }

@@ -1,5 +1,5 @@
 
-export interface message {
+export interface Message {
     id: string;
     source: string;
     target: string;
