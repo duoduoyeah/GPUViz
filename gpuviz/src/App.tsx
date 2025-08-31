@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavigationPanel from "./components/navigation/NavigationPanel";
 import NewPage from "./components/pages/Daisen";
@@ -6,9 +6,22 @@ import ChainSight from "./components/pages/ChainSight";
 import Gpuviz from "./components/pages/Gpuviz";
 import Index from "./components/index/Index";
 import "./App.css";
+import { exec } from "child_process";
 
 
 const App: React.FC = () => {
+  // Start the Go SQLite server when the app initializes
+  exec("go run ./src/models/dataLoader/go-sqlite-server/main.go", (error, stdout, stderr) => {
+    if (error) {
+      console.error(`Error starting Go SQLite server: ${error.message}`);
+      return;
+    }
+    if (stderr) {
+      console.error(`Go SQLite server stderr: ${stderr}`);
+    }
+    console.log(`Go SQLite server stdout: ${stdout}`);
+  });
+
   return (
     <Router>
       <div style={{ display: "flex" }}>

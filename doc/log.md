@@ -4,13 +4,16 @@
 
 ---
 ## TODO
-1. File and string in input
+1. sqlite server
 2. gpuStore, the messages related data, in map.
-3. the chainSight page, method to get the chain
-4. 
+3. the chainSight page -> left panel
+4. the chainSight page -> right-upper graph
+5. the chainSight page -> right-down graph analyzer
 
 ---
-8.30
+8.31
+
+1. File and string in input
 
 ---
 8.29

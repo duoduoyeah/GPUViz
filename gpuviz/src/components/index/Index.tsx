@@ -8,7 +8,7 @@ const Index: React.FC = () => {
   <div className={styles["index-page"]}>
     <h1>Config</h1>
     <p>Start by importing your GPU visualization data file.</p>
-    <p>Supported formats: <b>.json</b>, <b>.sqlite</b></p>
+    <p>Supported formats: <b>.sqlite</b></p>
     <div style={{ margin: "16px 0" }}>
       <label htmlFor="data-file" style={{ marginRight: "12px" }}>
         <input
@@ -21,7 +21,6 @@ const Index: React.FC = () => {
             if (file) {
               alert(`Selected file: ${file.name}`);
               // TODO: handle file upload/processing
-              loadDataFromFile(file);
             }
           }}
         />
