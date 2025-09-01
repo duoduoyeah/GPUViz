@@ -1,14 +1,14 @@
 [Pin]
 * layout should be tidy, no lines cross each other
 * delete component without any edge.
-
----
-## TODO
-1. sqlite server
 2. gpuStore, the messages related data, in map.
 3. the chainSight page -> left panel
 4. the chainSight page -> right-upper graph
 5. the chainSight page -> right-down graph analyzer
+---
+## TODO
+1. sqlite server
+
 
 ---
 8.31
