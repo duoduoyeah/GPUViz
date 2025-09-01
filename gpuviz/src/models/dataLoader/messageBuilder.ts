@@ -1,5 +1,5 @@
 import type {Message, MessageEntry} from "../../types"
-import Database from 'better-sqlite3';
+
 
 
 
@@ -8,11 +8,7 @@ import Database from 'better-sqlite3';
 
 export class MessageBuilder {
 
-    public readMessagesFromSQLite(sqliteFilePath: string): MessageEntry[] {
-    const db = new Database(sqliteFilePath);
-    const rows = db.prepare('SELECT ID, Source, Destination, EnqueueTime, TransmitTime, ReceiveTime, DequeueTime FROM messages').all();
-    db.close();
-    return rows as MessageEntry[];
+    public readMessagesFromSQLite(){
     }
 
     public buildFromsqlite(rawMsgs: MessageEntry[]): Map<string, Message> {

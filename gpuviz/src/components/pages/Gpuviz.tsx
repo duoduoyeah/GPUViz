@@ -3,29 +3,19 @@ import { AppLayout } from "../Layout/AppLayout";
 import { ConfigPanel } from "../ConfigPanel/ConfigPanel";
 import GraphCanvas, { type GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
 import useGpuStore from "../../store/gpuStore";
-// import { DEFAULT_DATA_PATH } from "../../config/default"; //deprecate
+import { loadDataFromFile } from "../../components/index/DataLoader";
+
 
 const gpuviz: React.FC = () => {
-	const { setActiveLevel, modifyGraph, loading, error } = useGpuStore();
+	const { setActiveLevel, modifyGraph, loading, error, currentGraph } = useGpuStore();
 	const graphCanvasRef = useRef<GraphCanvasHandles>(null);
 
-	// useEffect(() => {
-	// 	const loadDefaultData = async () => {
-	// 		try {
-	// 			const response = await fetch(DEFAULT_DATA_PATH);
-	// 			if (!response.ok) {
-	// 				throw new Error(`Failed to load data: ${response.statusText}`);
-	// 			}
-	// 			const jsonData = await response.json();
-	// 			loadTopology(jsonData);
-	// 		} catch (err) {
-	// 			console.error("Error loading default data:", err);
-	// 		}
-	// 	};
-	// 	if (!componentTree && !loading && !error) {
-	// 		loadDefaultData();
-	// 	}
-	// }, [loadTopology, componentTree, loading, error]);
+
+  useEffect(() => {
+    if (!currentGraph) {
+      loadDataFromFile();
+    }
+  }, [currentGraph]);
 
 	const handleConfigSubmit = (config: {
 		filter: "all" | "tidy";

@@ -7,6 +7,7 @@ import type {
 } from "../../types";
 import { ComponentNodeImpl } from "../component/componentNode";
 import { PortImpl } from "../port/port";
+import { SQLITE_SERVER_PORT } from "../../config/default";
 
 
 export class SqliteComponentNodeBuilder {
@@ -17,56 +18,33 @@ export class SqliteComponentNodeBuilder {
     this.defaultInfo = defaultInfo;
   }
 
-    /**
-     * Checks if the required tables and columns exist in the SQLite database.
-     * Returns true if both tables and columns are present, false otherwise.
-     */
-    public validateRequiredTablesAndColumns(sqliteFilePath: string): boolean {
-      const Database = require('better-sqlite3');
-      const db = new Database(sqliteFilePath);
-      // Check for tables
-      const tables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all().map((row: any) => row.name);
-      if (!tables.includes('topology_ports')) {
-        console.error('Missing table: topology_ports');
-        return false;
+
+    public async readTopologyPortFromSQlite(): Promise<TopologyPortEntry[]> {
+      try {
+        const response = await fetch(`http://localhost:${SQLITE_SERVER_PORT}/api/topology_ports`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch topology ports: ${response.statusText}`);
+        }
+        const data: TopologyPortEntry[] = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching topology ports:", error);
+        return [];
       }
-      if (!tables.includes('port_connections')) {
-        console.error('Missing table: port_connections');
-        return false;
-      }
-      // Check columns for topology_ports
-      const topologyPortsColumns = db.prepare("PRAGMA table_info('topology_ports')").all().map((row: any) => row.name);
-      if (!topologyPortsColumns.includes('Port') || !topologyPortsColumns.includes('Component')) {
-        console.error('Missing required columns in topology_ports: Port, Component');
-        return false;
-      }
-      // Check columns for port_connections
-      const portConnectionsColumns = db.prepare("PRAGMA table_info('port_connections')").all().map((row: any) => row.name);
-      if (!portConnectionsColumns.includes('SourcePort') || !portConnectionsColumns.includes('DestinationPort')) {
-        console.error('Missing required columns in port_connections: SourcePort, DestinationPort');
-        return false;
-      }
-      return true;
     }
 
-    public readTopologyPortFromSQlite(sqliteFilePath: string): TopologyPortEntry[] {
-      const Database = require('better-sqlite3');
-      const db = new Database(sqliteFilePath);
-      const rows = db.prepare('SELECT Port, Component FROM topology_ports').all();
-      return rows.map((row: any) => ({
-        port: row.Port,
-        component: row.Component,
-      })) as TopologyPortEntry[];
-    }
-
-    public readPortConnectionFromSQlite(sqliteFilePath: string): PortConnectionEntry[] {
-      const Database = require('better-sqlite3');
-      const db = new Database(sqliteFilePath);
-      const rows = db.prepare('SELECT SourcePort, DestinationPort FROM port_connections').all();
-      return rows.map((row: any) => ({
-        from_port: row.SourcePort,
-        to_port: row.DestinationPort,
-      })) as PortConnectionEntry[];
+    public async readPortConnectionFromSQlite(): Promise<PortConnectionEntry[]> {
+      try {
+        const response = await fetch(`http://localhost:${SQLITE_SERVER_PORT}/api/ports_connection`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch port connections: ${response.statusText}`);
+        }
+        const data: PortConnectionEntry[] = await response.json();
+        return data;
+      } catch (error) {
+        console.error("Error fetching port connections:", error);
+        return [];
+      }
     }
 
     public buildFromSqlite(rawPorts: TopologyPortEntry[], rawConnections: PortConnectionEntry[]): ComponentNode[] {

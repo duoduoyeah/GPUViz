@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"regexp"
 	"syscall"
 	"time"
 
@@ -19,7 +20,34 @@ var (
 	sqlitePath = flag.String("db", "", "path to sqlite database file")
 	addr       = flag.String("addr", ":8080", "http listen address")
 	db         *sql.DB
+
+	localhostRegex = regexp.MustCompile(`^https?://localhost(:\d+)?$`)
 )
+
+// CORS middleware
+func enableCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		origin := r.Header.Get("Origin")
+
+		// Check if origin is localhost with any port
+		if origin != "" && localhostRegex.MatchString(origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+
+		// Handle preflight requests
+		if r.Method == "OPTIONS" {
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Requested-With")
+			w.Header().Set("Access-Control-Max-Age", "3600")
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+
+		// Call the actual handler
+		next(w, r)
+	}
+}
 
 func openSQLiteFile(path string) (*sql.DB, error) {
 	return sql.Open("sqlite3", "file:"+path+"?mode=ro&cache=shared")
@@ -44,10 +72,10 @@ func startServer(ctx context.Context, addr string) error {
 		Handler: nil,
 	}
 
-	http.HandleFunc("/api/message", httpMessageByID)
-	http.HandleFunc("/api/message_by_src_dst", httpMessageBySrcDst)
-	http.HandleFunc("/api/ports_connection", httpPortConnectionAllRecords)
-	http.HandleFunc("/api/topology_ports", httpTopologyPorts)
+	http.HandleFunc("/api/message", enableCORS(httpMessageByID))
+	http.HandleFunc("/api/message_by_src_dst", enableCORS(httpMessageBySrcDst))
+	http.HandleFunc("/api/ports_connection", enableCORS(httpPortConnectionAllRecords))
+	http.HandleFunc("/api/topology_ports", enableCORS(httpTopologyPorts))
 
 	// Start server in a goroutine
 	go func() {
