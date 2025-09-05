@@ -7,8 +7,17 @@
 5. the chainSight page -> right-down graph analyzer
 ---
 ## TODO
-1. sqlite server
+2. // create parent component if none-exist in sqliteComponentBuilder.
 
+---
+9.5
+1. componentBuilder
+
+---
+9.4
+1. DMA should be in the topology port table [Done, debug]
+2. What about RDMA [Not a problem]
+3. In the ports_connection, there may be duplicated connections [Not a problem for now]
 
 ---
 8.31

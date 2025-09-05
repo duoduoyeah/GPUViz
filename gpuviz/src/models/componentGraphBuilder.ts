@@ -6,7 +6,7 @@ import type {
 import { componentGraphEdgeHelper as edgeHelper } from "./edge/edgeHelper";
 import { componentHelper } from "./component/componentHelper";
 import { EdgeTypeMap } from "./edge/edgeTypeMap";
-import { ComponentBuilder } from "./component/componentBuilder";
+import { ComponentBuilder } from "./component/combineComponentBuilder";
 import {PortBuilder} from "./port/portBuilder"
 import { CombinedPort } from "./port/port";
 import { PortHelper } from "./port/portHelper";

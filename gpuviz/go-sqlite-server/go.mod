@@ -12,4 +12,4 @@ require (
 	github.com/tebeka/atexit v0.3.0 // indirect
 )
 
-replace github.com/sarchlab/akita/v4 => /home/yijie/workspace/simulator/akita
+replace github.com/sarchlab/akita/v4 => /home/shiyuan/workspace/simulator/akita

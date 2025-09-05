@@ -15,6 +15,7 @@ export class ComponentNodeImpl implements ComponentNode {
 
   type: string = "";
   shape: ComponentKind;
+  isRoot: boolean = false;
 
   combinedComponent: ComponentNode | undefined;
   parent: ComponentNode | undefined;
@@ -49,6 +50,10 @@ export class ComponentNodeImpl implements ComponentNode {
 
   setShape(): void {
     this.shape = "square";
+  }
+
+  setRoot(): void {
+    this.isRoot = true;
   }
 
   setParent(parent: ComponentNode): void {
@@ -93,6 +98,10 @@ export class ComponentNodeImpl implements ComponentNode {
 
   getSubcomponents(): ComponentNode[] {
     return this.subComponents;
+  }
+
+  checkIsRoot(): boolean {
+    return this.isRoot;
   }
 
   addChild(child: ComponentNode): void {
@@ -141,11 +150,12 @@ export class ComponentNodeImpl implements ComponentNode {
   // Check name
   if (!this.name || this.name.trim() === "") return false;
 
-  // Check info is not nil
-  if (!this.info) return false;
-
   // Check shape is set
   if (!this.shape) return false;
+
+  if (!this.checkIsRoot) {
+    if (!this.parent) return false;
+  }
 
   return true;
   }

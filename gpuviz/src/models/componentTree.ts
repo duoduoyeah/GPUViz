@@ -1,19 +1,12 @@
-import type { ComponentNode, NodeInfo, ComponentTree } from "../types";
-import { ComponentNodeImpl } from "./component/componentNode";
+import type { ComponentNode, ComponentTree } from "../types";
 
 export class ComponentTreeImpl implements ComponentTree {
   root: ComponentNode;
   depth: number;
-  levelMap: Map<number, ComponentNode[]>;
+  levelMap: Map<number, ComponentNode[]> = new Map<number, ComponentNode[]>();
 
-  constructor(roots: ComponentNode[]) {
-    this.root = new ComponentNodeImpl("tree_root");
-    this.root.setChildren(roots);
-    for (const i in roots) {
-      roots[i].setParent(this.root);
-    }
-
-    this.levelMap = new Map<number, ComponentNode[]>();
+  constructor(root: ComponentNode) {
+    this.root = root
     this.depth = this.setDepth();
     for (let level = 0; level <= this.depth; level++) {
       this.levelMap.set(level, this.setNodesAtLevel(level));

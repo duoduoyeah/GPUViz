@@ -53,9 +53,11 @@ export interface ComponentNode {
   setShape(): void;
   addChild(child: ComponentNode): void;
   setCombinedComponent(component: ComponentNode | undefined): void;
+  setRoot(): void;
 
   //bool
   isAncestor(node: ComponentNode): boolean;
   isIsolated(): boolean;
+  checkIsRoot(): boolean;
   validateComponent(): boolean;
 }

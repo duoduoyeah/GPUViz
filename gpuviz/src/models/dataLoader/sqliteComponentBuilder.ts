@@ -5,17 +5,27 @@ import type {
   TopologyPortEntry,
   PortConnectionEntry,
 } from "../../types";
-import { ComponentNodeImpl } from "../component/componentNode";
 import { PortImpl } from "../port/port";
 import { SQLITE_SERVER_PORT } from "../../config/default";
+import { ComponentBuilder } from "../component/componentBuilder";
 
 
 export class SqliteComponentNodeBuilder {
   private componentMap: Map<string, ComponentNode> = new Map();
+  private portMap: Map<string, Port> = new Map();
   private defaultInfo: NodeInfo;
+  private rootComponentName: string = "root";
+  private rootComponent: ComponentNode;
 
   constructor(defaultInfo: NodeInfo) {
     this.defaultInfo = defaultInfo;
+    this.rootComponent = new ComponentBuilder(this.rootComponentName)
+        .withInfo(this.defaultInfo)
+        .withType(this.getType(this.rootComponentName))
+        .withShape()
+        .build();
+    this.rootComponent.setRoot();
+    this.componentMap.set(this.rootComponentName, this.rootComponent)
   }
 
 
@@ -47,99 +57,129 @@ export class SqliteComponentNodeBuilder {
       }
     }
 
-    public buildFromSqlite(rawPorts: TopologyPortEntry[], rawConnections: PortConnectionEntry[]): ComponentNode[] {
+    public buildFromSqlite(rawPorts: TopologyPortEntry[], rawConnections: PortConnectionEntry[]): ComponentNode {
       //Later: validate if sqlite file has error
 
-      //create all components
-      const components = this.createComponents(rawPorts);
-
+      //create all components, ports
+      this.createComponents(rawPorts);
+      this.connectComponentPorts(rawPorts, rawConnections);
+      
       //set up components
-      this.finalizeComponentNodeConnections(components, rawConnections);
+      this.addParentComponent();
+      this.establishParentChildRelationships();
+      
 
       //validation component list
-      for (const component of components) {
+      for (const [_, component] of this.componentMap) {
         if (!component.validateComponent()) {
           console.error(`Component validation failed for:`, component);
         }
       }
 
-    //output only root components (those without a parent)
-    return components.filter(component => component.getParent() === undefined);
+    //output only root component
+    return this.rootComponent;
     }
 
-     /**
-     * Establishes parent-child relationships between components and connects their ports.
-     */
-    private finalizeComponentNodeConnections(
-      components: ComponentNode[],
-      rawConnections: PortConnectionEntry[],
-    ): void {
-      this.establishParentChildRelationships(components);
-      this.connectComponentPorts(rawConnections, components);
-    }
+    private addParentComponent(): void {
+      const tempComponentList: ComponentNode[] = [];
+      const tempComponentNames = new Set<string>();
 
-    private establishParentChildRelationships(components: ComponentNode[]): void {
-      const componentMap = new Map<string, ComponentNode>();
-      for (const component of components) {
-        componentMap.set(component.getName(), component);
+      // For each component in the map, recursively check the parent
+      for (const [name] of this.componentMap) {
+        this.ensureParentExists(name, tempComponentList, tempComponentNames);
       }
 
-      for (const component of components) {
-        const name = component.getName();
-        const lastDotIndex = name.lastIndexOf(".");
-        if (lastDotIndex === -1) continue; // No parent (root)
-        const parentName = name.substring(0, lastDotIndex);
-        const parent = componentMap.get(parentName);
-        if (parent) {
-          component.setParent(parent);
-          parent.addChild(component);
-        }
+      // At the end, add all components in the temp list to our map
+      for (const component of tempComponentList) {
+        this.componentMap.set(component.getName(), component);
       }
+
     }
     
-    // Connect component ports using PortConnectionEntry
-    private connectComponentPorts(portEntries: PortConnectionEntry[], components: ComponentNode[]) {
-      const componentMap = new Map<string, ComponentNode>();
-
-      for (const component of components) {
-        componentMap.set(component.getName(), component);
+    private ensureParentExists(
+      componentName: string,
+      tempComponentList: ComponentNode[],
+      tempComponentNames: Set<string>,
+    ): void {
+      const parentName = this.getParentName(componentName);
+  
+      if (!parentName) {
+        return; // No parent (root component)
       }
-      
-      // STEP 1: create port and add port to each component
-      const portMap = new Map<string, Port>();
-      for (const entry of portEntries) {
-        const fromPort = portMap.get(entry.from_port);
-        if (!fromPort) {
-            const newFromPort = new PortImpl(entry.from_port);
-            portMap.set(entry.from_port, newFromPort);
-        }
-        const toPort = portMap.get(entry.to_port);
-        if (!toPort) {
-            const newToPort = new PortImpl(entry.to_port);
-            portMap.set(entry.to_port, newToPort);
-        }
+  
+      if (
+        this.componentMap.has(parentName) ||
+        tempComponentNames.has(parentName)
+      ) {
+        return;
       }
+  
+      this.ensureParentExists(parentName, tempComponentList, tempComponentNames);
+  
+      // Create the parent component using initializeComponent method
+      const parentComponentEntry: TopologyPortEntry = {
+        port: "",
+        component: parentName, // Parent components get empty ports by default
+      };
+  
+      // Use initializeComponent to create the parent component
+      const parentComponent = this.initializeComponent(parentComponentEntry);
+  
+      tempComponentList.push(parentComponent);
+      tempComponentNames.add(parentName);
+    }
 
-      // step 2: set owner of each port in the portMap
-      for (const [portName, port] of portMap.entries()) {
-        const ownerName = this.getPortOwner(portName);
-        const ownerComponent = componentMap.get(ownerName);
-        if (ownerComponent) {
-          port.setOwner(ownerComponent);
-          ownerComponent.addPort(port);
+    private establishParentChildRelationships() {
+      for (const [name, component] of this.componentMap) {
+        const parentName = this.getParentName(name);
+        if (parentName) {
+          // We can safely get the parent as we've ensured it exists
+          const parent = this.componentMap.get(parentName);
+          if (parent) {
+          component.setParent(parent);
+          parent.addChild(component);
+          } else {
+            console.error(`Parent component not found: ${parent}`);
+          }
+
         } else {
-          console.error(`Owner component not found for port: ${portName}`);
+            if (!component.checkIsRoot()) {
+              component.setParent(this.rootComponent);
+              this.rootComponent.addChild(component);
+            }
+          }
+      }
+    }
+
+    private getParentName(name: string): string | null {
+      const lastDotIndex = name.lastIndexOf(".");
+      if (lastDotIndex === -1) return null;
+      return name.substring(0, lastDotIndex);
+    }
+
+    // Connect component ports using PortConnectionEntry
+    private connectComponentPorts(rawPorts: TopologyPortEntry[], rawConnections: PortConnectionEntry[]) {
+      const portMap = this.portMap;
+      for (const rawPort of rawPorts) {
+        const component = this.componentMap.get(rawPort.component);
+        if (component) {
+          const port = new PortImpl(rawPort.port);
+          portMap.set(rawPort.port, port);
+          port.setOwner(component);
+          component.addPort(port);
+        } else {
+          console.error(`Owner component not found for port: ${rawPort.port}`);
         }
       }
 
       // Step 3: outgoing and incoming of ports
-      for (const entry of portEntries) {
+      for (const entry of rawConnections) {
         const fromPort = portMap.get(entry.from_port);
         const toPort = portMap.get(entry.to_port);
         // Add to outgoing ports of fromPort
         if (fromPort && toPort) {
           fromPort.addOutgoingPort(toPort);
-          toPort.addIncomingPort(fromPort)
+          toPort.addIncomingPort(fromPort);
         } else {
           console.error(`Port not found for connection: from ${entry.from_port} to ${entry.to_port}`);
         }
@@ -149,35 +189,33 @@ export class SqliteComponentNodeBuilder {
       // TODO: Add validation logic here (duplicate/invalid connections)
     }
 
-    private createComponents(rawPorts: TopologyPortEntry[]): ComponentNode[] {
-      // Map to ensure each component is created only once
-      const componentMap: Map<string, ComponentNodeImpl> = new Map();
-      // First, create all components
+    private createComponents(rawPorts: TopologyPortEntry[]): void {
+
+
+      // First, create all components using initializeComponent
       for (const rawPort of rawPorts) {
-        if (!componentMap.has(rawPort.component)) {
-          const component = new ComponentNodeImpl(rawPort.component);
-          component.setInfo(this.defaultInfo);
-          componentMap.set(rawPort.component, component);
+        if (!this.componentMap.has(rawPort.component)) {
+          const component = this.initializeComponent(rawPort);
+          this.componentMap.set(rawPort.component, component);
         }
       }
-      // Then, create ports and assign them to their components
-      for (const rawPort of rawPorts) {
-        const component = componentMap.get(rawPort.component);
-        if (component) {
-          const port = new PortImpl(rawPort.port);
-          port.setOwner(component);
-          component.ports.push(port);
-        }
-      }
-      return Array.from(componentMap.values());
     }
 
-    private getPortOwner(portName: string): string {
-        const lastDotIndex = portName.lastIndexOf(".");
-        if (lastDotIndex === -1) {
-            console.error(`No owner name for port: ${portName}`);
-            return portName; // No owner, return the port name itself
-        }
-        return portName.substring(0, lastDotIndex);
+    private initializeComponent(rawPort: TopologyPortEntry): ComponentNode {
+      return new ComponentBuilder(rawPort.component)
+        .withInfo(this.defaultInfo)
+        .withType(this.getType(rawPort.component))
+        .withShape()
+        .build();
     }
+
+    getType(name: string) {
+      const parts = name.split(".");
+      if (parts.length === 0) return "";
+
+      const lastPart = parts[parts.length - 1];
+      // Remove array indices to get the type
+      const typeMatch = lastPart.match(/^([^[]+)/);
+      return typeMatch ? typeMatch[1] : "";
+  }
 }

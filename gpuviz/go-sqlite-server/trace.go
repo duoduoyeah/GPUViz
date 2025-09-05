@@ -112,7 +112,7 @@ func httpMessageByID(w http.ResponseWriter, r *http.Request) {
 
 func httpPortConnectionAllRecords(w http.ResponseWriter, r *http.Request) {
 	// Prepare the SQL query
-	query := "SELECT from_port, to_port FROM ports_connection"
+	query := "SELECT SourcePort, DestinationPort FROM ports_connection"
 
 	// Execute the query
 	rows, err := db.Query(query)
