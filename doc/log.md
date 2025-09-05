@@ -5,14 +5,20 @@
 3. the chainSight page -> left panel
 4. the chainSight page -> right-upper graph
 5. the chainSight page -> right-down graph analyzer
+
+6. gpuviz, add select component in the panel
+
 ---
 ## TODO
-2. // create parent component if none-exist in sqliteComponentBuilder.
+1. message builder
+2. Edge metrics: think two metrics that correspond to daisen.
+ -> amount / time
+ -> variance when level is not the lowest level
 
 ---
 9.5
 1. componentBuilder
-
+2. // create parent component if none-exist in sqliteComponentBuilder.
 ---
 9.4
 1. DMA should be in the topology port table [Done, debug]

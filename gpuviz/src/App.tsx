@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavigationPanel from "./components/navigation/NavigationPanel";
 import NewPage from "./components/pages/Daisen";
-import ChainSight from "./components/pages/ChainSight";
-import Gpuviz from "./components/pages/Gpuviz";
+import ChainSight from "./components/ChainSight/ChainSight";
+import Gpuviz from "./components/GPUViz/Gpuviz";
 import Index from "./components/index/Index";
 import "./App.css";
 

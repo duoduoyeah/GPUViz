@@ -1,4 +1,4 @@
-//Outdated file
+// This file is outdated and no longer in use.
 import type {
   ComponentNode,
   Port,

@@ -1,15 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import { AppLayout } from "../Layout/AppLayout";
-import { ConfigPanel } from "../ConfigPanel/ConfigPanel";
+import { ConfigPanel } from "./ConfigPanel/ConfigPanel";
 import GraphCanvas, { type GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
 import useGpuStore from "../../store/gpuStore";
-import { loadDataFromFile } from "../../components/index/DataLoader";
+import { loadDataFromFile } from "../index/DataLoader";
 
 
 const gpuviz: React.FC = () => {
 	const { setActiveLevel, modifyGraph, loading, error, currentGraph } = useGpuStore();
 	const graphCanvasRef = useRef<GraphCanvasHandles>(null);
-
 
   useEffect(() => {
     if (!currentGraph) {

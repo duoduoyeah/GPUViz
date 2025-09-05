@@ -31,6 +31,8 @@ interface GpuStoreState {
   selectNode: (nodeId: string | null) => void;
   selectComponent: (componentId: string) => void;
   modifyGraph: (type: "all" | "tidy") => void;
+
+  // 
 }
 
 // Create the store
