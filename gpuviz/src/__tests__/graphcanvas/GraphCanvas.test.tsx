@@ -1,9 +1,9 @@
 import { render, screen, act } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import GraphCanvas from "../../components/GraphCanvas/GraphCanvas";
-import useGpuStore from "../../store/gpuStore";
-import { GraphCore } from "../../components/GraphCanvas/GraphCore";
-import { GraphEvents } from "../../components/GraphCanvas/GraphEvents";
+import GraphCanvas from "../../components/GPUViz/GraphCanvas/GraphCanvas";
+import useGpuStore from "../../store/topoStore";
+import { GraphCore } from "../../components/GPUViz/GraphCanvas/GraphCore";
+import { GraphEvents } from "../../components/GPUViz/GraphCanvas/GraphEvents";
 import type { ComponentKind } from "../../types";
 
 // Mock GraphCore and GraphEvents

@@ -1,18 +1,18 @@
 import React from "react";
 import { infoPanelStyles } from "./styles/InfoPanel.styles";
-import type { Graph, GraphNode } from "../../types";
+import type { Graph, GraphNode } from "../../../types";
 
 interface InfoPanelProps {
   selectedNodeInfo: GraphNode | null;
   currentGraph: Graph | null;
-  selectNode: (id: string | null) => void;
+  getNodeInfo: (id: string | null) => void;
   selectComponent: (id: string) => void;
 }
 
 const InfoPanel: React.FC<InfoPanelProps> = ({
   selectedNodeInfo,
   currentGraph,
-  selectNode,
+  getNodeInfo,
   selectComponent,
 }) => {
   if (!selectedNodeInfo) {
@@ -23,7 +23,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
     <div style={infoPanelStyles.componentInfo}>
       <button 
         style={infoPanelStyles.componentInfoCloseButton}
-        onClick={() => selectNode(null)}
+        onClick={() => getNodeInfo(null)}
         title="Close panel"
       >
         ×

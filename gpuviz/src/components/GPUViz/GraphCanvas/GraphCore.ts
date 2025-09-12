@@ -1,5 +1,5 @@
 import cytoscape from "cytoscape";
-import type { CytoscapeGraph } from "../../types";
+import type { CytoscapeGraph } from "../../../types";
 import { DEFAULT_GRAPH_OPTIONS, LAYOUT_PRESETS } from "./styles/GraphConfig.style";
 import type { LayoutType } from "./styles/GraphConfig.style";
 

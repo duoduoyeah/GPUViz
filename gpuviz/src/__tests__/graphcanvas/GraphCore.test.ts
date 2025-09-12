@@ -1,6 +1,6 @@
-import { GraphCore } from "../../components/GraphCanvas/GraphCore";
+import { GraphCore } from "../../components/GPUViz/GraphCanvas/GraphCore";
 import type { Graph } from "../../types";
-import { LAYOUT_PRESETS } from "../../components/GraphCanvas/styles/GraphConfig.style";
+import { LAYOUT_PRESETS } from "../../components/GPUViz/GraphCanvas/styles/GraphConfig.style";
 
 // Mock Cytoscape for testing
 const mockCytoscapeInstance = {

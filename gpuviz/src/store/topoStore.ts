@@ -4,9 +4,8 @@ import {CytoscapeGraphBuilder} from "../models/cytoscapeGraphBuilder"
 import type {CytoscapeGraph} from "../types";
 
 // Define the store state interface
-interface GpuStoreState {
+interface TopoStoreState {
   // Data state
-  // componentTree: ComponentTree | null;
   cytoscapeGraphBuilder: CytoscapeGraphBuilder | null;
   currentGraph: CytoscapeGraph | null;
   activeLevel: number;
@@ -28,7 +27,7 @@ interface GpuStoreState {
 
   // gpuviz Actions
   setActiveLevel: (level: number) => void;
-  selectNode: (nodeId: string | null) => void;
+  getNodeInfo: (nodeId: string | null) => void;
   selectComponent: (componentId: string) => void;
   modifyGraph: (type: "all" | "tidy") => void;
 
@@ -36,7 +35,7 @@ interface GpuStoreState {
 }
 
 // Create the store
-const useGpuStore = create<GpuStoreState>((set, get) => ({
+const useGpuStore = create<TopoStoreState>((set, get) => ({
   // Initial state
   cytoscapeGraphBuilder: null,
   currentGraph: null,
@@ -98,7 +97,7 @@ const useGpuStore = create<GpuStoreState>((set, get) => ({
     });
   },
 
-  selectNode: (nodeId) => {
+  getNodeInfo: (nodeId) => {
     const { currentGraph } = get();
     set({ selectedNode: nodeId });
     

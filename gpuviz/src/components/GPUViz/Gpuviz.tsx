@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from "react";
 import { AppLayout } from "../Layout/AppLayout";
 import { ConfigPanel } from "./ConfigPanel/ConfigPanel";
-import GraphCanvas, { type GraphCanvasHandles } from "../GraphCanvas/GraphCanvas";
-import useGpuStore from "../../store/gpuStore";
+import GraphCanvas, { type GraphCanvasHandles } from "./GraphCanvas/GraphCanvas";
+import useGpuStore from "../../store/topoStore";
 import { loadDataFromFile } from "../index/DataLoader";
 
 

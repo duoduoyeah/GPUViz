@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useCallback,
 } from "react";
-import useGpuStore from "../../store/gpuStore";
+import useGpuStore from "../../../store/topoStore";
 import { GraphCore } from "./GraphCore";
 import { GraphEvents } from "./GraphEvents";
 import { styles } from "./styles/GraphCanvas.styles";
@@ -45,7 +45,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
   const [initSuccessful, setInitSuccessful] = useState(false);
 
   // Get graph data from store
-  const { currentGraph, loading, error, selectNode, selectComponent, selectedNodeInfo } = useGpuStore();
+  const { currentGraph, loading, error, getNodeInfo, selectComponent, selectedNodeInfo } = useGpuStore();
 
   // Setup event handlers for graph interactions
   const setupEventHandlers = useCallback(() => {
@@ -53,13 +53,13 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
 
     // Handle node clicks
     graphEventsRef.current.on("nodeClick", (nodeData: any) => {
-      selectNode(nodeData.id);
+      getNodeInfo(nodeData.id);
     });
 
     // Handle node hover (mouseover)
     graphEventsRef.current.on("nodeHover", (nodeData: any) => {
       console.log("GraphCanvas: Node hovered:", nodeData);
-      selectNode(nodeData.id);
+      getNodeInfo(nodeData.id);
     });
 
     // Handle node unhover (mouseout)
@@ -71,7 +71,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     // Handle canvas clicks (deselect)
     graphEventsRef.current.on("canvasClick", () => {
       console.log("GraphCanvas: Canvas clicked");
-      selectNode(null);
+      getNodeInfo(null);
     });
 
     // Handle element selection
@@ -93,10 +93,10 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     graphEventsRef.current.on("nodeDoubleClick", (nodeData: any) => {
       console.log("GraphCanvas: Node double-clicked:", nodeData);
       // Call the new selectComponent method from the store
-      selectNode(null);
+      getNodeInfo(null);
       selectComponent(nodeData.id);
     });
-  }, [selectNode, selectComponent]);
+  }, [getNodeInfo, selectComponent]);
 
   // Initialize the graph core and events
   useEffect(() => {
@@ -245,7 +245,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
         <InfoPanel
           selectedNodeInfo={selectedNodeInfo}
           currentGraph={currentGraph}
-          selectNode={selectNode}
+          getNodeInfo={getNodeInfo}
           selectComponent={selectComponent}
         />
 

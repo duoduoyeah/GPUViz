@@ -1,4 +1,4 @@
-import { GraphEvents } from "../../components/GraphCanvas/GraphEvents";
+import { GraphEvents } from "../../components/GPUViz/GraphCanvas/GraphEvents";
 import cytoscape from "cytoscape";
 
 // Mock element collection

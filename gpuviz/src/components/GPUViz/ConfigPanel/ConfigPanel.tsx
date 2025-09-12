@@ -18,7 +18,7 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
   graphCanvasRef,
 }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [level, setLevel] = useState<number | "">("");
+  const [level, setLevel] = useState<number | "">(1);
   const [filter, setFilter] = useState<"all" | "tidy">("all");
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -88,7 +88,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             }}
             min={0}
             style={styles.levelInput}
-            placeholder="0"
           />
         </label>
         <button onClick={handleLevelUpdate} style={styles.submitButton}>
@@ -113,6 +112,10 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             Tidy
           </button>
         </div>
+
+        <button onClick={handleSubmit} style={styles.submitButton}>
+          Apply Filters
+        </button>
       </div>
 
       {/* Item list */}
@@ -128,13 +131,6 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({
             {item}
           </label>
         ))}
-      </div>
-
-      {/* Submit button */}
-      <div style={styles.submitSection}>
-        <button onClick={handleSubmit} style={styles.submitButton}>
-          Apply Filters
-        </button>
       </div>
 
       {/* Graph Controls */}

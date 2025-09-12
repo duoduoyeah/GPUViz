@@ -11,9 +11,19 @@
 ---
 ## TODO
 1. message builder
+
 2. Edge metrics: think two metrics that correspond to daisen.
  -> amount / time
  -> variance when level is not the lowest level
+
+---
+9.12
+1. update the gpuviz panel: add type and component_id to let the user pick what
+he wanted.
+-> later, view in ChainSight
+
+2. update the message, first create only one Chain, but make sure there are
+combined(SA leve, GPU level) and original. 
 
 ---
 9.5
