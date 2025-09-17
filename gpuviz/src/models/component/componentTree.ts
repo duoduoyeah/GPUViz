@@ -1,4 +1,4 @@
-import type { ComponentNode, ComponentTree } from "../types";
+import type { ComponentNode, ComponentTree } from "../../types";
 
 export class ComponentTreeImpl implements ComponentTree {
   root: ComponentNode;

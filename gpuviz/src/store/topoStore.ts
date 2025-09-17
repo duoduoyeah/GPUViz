@@ -1,7 +1,13 @@
 import { create } from "zustand";
-import { ComponentGraphExtractor } from "../models/componentGraphBuilder";
-import {CytoscapeGraphBuilder} from "../models/cytoscapeGraphBuilder"
+import { ComponentGraphExtractor, ComponentViewerImpl } from "../models/component";
+import {CytoscapeGraphBuilder} from "../models/cytoscapeGraphBuilder";
 import type {CytoscapeGraph} from "../types";
+// import type {ChainCache, ComponentCache} from "./storeCache";
+import * as Cache from "./typostoreCache";
+
+
+type ComponentCache = Cache.ComponentCache;
+type ChainCache = Cache.ChainCache;
 
 // Define the store state interface
 interface TopoStoreState {
@@ -9,6 +15,8 @@ interface TopoStoreState {
   cytoscapeGraphBuilder: CytoscapeGraphBuilder | null;
   currentGraph: CytoscapeGraph | null;
   activeLevel: number;
+  componentCache: ComponentCache | null;
+  chainCache: ChainCache | null;
 
   // UI state
   loading: boolean;
@@ -25,13 +33,17 @@ interface TopoStoreState {
   //Init methods
   loadTopology: (data: any) => void;
 
-  // gpuviz Actions
+  // grpah Actions
   setActiveLevel: (level: number) => void;
   getNodeInfo: (nodeId: string | null) => void;
-  selectComponent: (componentId: string) => void;
+  enterComponentView: (componentId: string) => void;
   modifyGraph: (type: "all" | "tidy") => void;
 
-  // 
+  // chain graph
+  // getChainLevels(): string[];
+  // getChainIdsByLevel(level: string): Chain[];
+  // viewChainGraphById(level: string, id: Chain): void;
+
 }
 
 // Create the store
@@ -40,6 +52,8 @@ const useGpuStore = create<TopoStoreState>((set, get) => ({
   cytoscapeGraphBuilder: null,
   currentGraph: null,
   activeLevel: 1,
+  componentCache: null,
+  chainCache: null,
 
   loading: false,
   error: null,
@@ -56,7 +70,8 @@ const useGpuStore = create<TopoStoreState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      const componentGraphExtractor = new ComponentGraphExtractor(componentTree);
+      const componentViewer = new ComponentViewerImpl(componentTree);
+      const componentGraphExtractor = new ComponentGraphExtractor(componentViewer);
 
       const cytoscapeGraphBuilder = new CytoscapeGraphBuilder(componentGraphExtractor);
     
@@ -112,7 +127,7 @@ const useGpuStore = create<TopoStoreState>((set, get) => ({
 
 
   // Handle component selection for graph updates (e.g., on double-click)
-  selectComponent: (componentId: string) => {
+  enterComponentView: (componentId: string) => {
     const { cytoscapeGraphBuilder, modifyGraph } = get();
     
     if (!cytoscapeGraphBuilder) {
@@ -121,14 +136,14 @@ const useGpuStore = create<TopoStoreState>((set, get) => ({
     }
     
     // Use the doubleClickComponent method to get the new graph
-    const newGraph = cytoscapeGraphBuilder.selectComponent(componentId);
+    const newGraph = cytoscapeGraphBuilder.enterComponentView(componentId);
     set({ currentGraph: newGraph });
     
     if (typeof modifyGraph === "function") {
       modifyGraph("tidy");
     }
 
-    console.log("Current graph after selectComponent:", get().currentGraph);
+    console.log("Current graph after enterComponentView:", get().currentGraph);
   },
 
   modifyGraph: (type: "all" | "tidy") => {

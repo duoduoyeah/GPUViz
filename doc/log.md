@@ -17,6 +17,14 @@
  -> variance when level is not the lowest level
 
 ---
+9.17
+1. chainViewer, chainGraphBuilder,
+---
+9.16
+1. finish the chainGraphBuilder and chainViewer
+2. 
+
+---
 9.12
 1. update the gpuviz panel: add type and component_id to let the user pick what
 he wanted.

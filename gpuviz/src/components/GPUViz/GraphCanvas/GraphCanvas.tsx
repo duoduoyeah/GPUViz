@@ -45,7 +45,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
   const [initSuccessful, setInitSuccessful] = useState(false);
 
   // Get graph data from store
-  const { currentGraph, loading, error, getNodeInfo, selectComponent, selectedNodeInfo } = useGpuStore();
+  const { currentGraph, loading, error, getNodeInfo, enterComponentView, selectedNodeInfo } = useGpuStore();
 
   // Setup event handlers for graph interactions
   const setupEventHandlers = useCallback(() => {
@@ -92,11 +92,11 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
     // Handle node double clicks
     graphEventsRef.current.on("nodeDoubleClick", (nodeData: any) => {
       console.log("GraphCanvas: Node double-clicked:", nodeData);
-      // Call the new selectComponent method from the store
+      // Call the new enterComponentView method from the store
       getNodeInfo(null);
-      selectComponent(nodeData.id);
+      enterComponentView(nodeData.id);
     });
-  }, [getNodeInfo, selectComponent]);
+  }, [getNodeInfo, enterComponentView]);
 
   // Initialize the graph core and events
   useEffect(() => {
@@ -246,7 +246,7 @@ const GraphCanvas: React.ForwardRefRenderFunction<GraphCanvasHandles> = (
           selectedNodeInfo={selectedNodeInfo}
           currentGraph={currentGraph}
           getNodeInfo={getNodeInfo}
-          selectComponent={selectComponent}
+          enterComponentView={enterComponentView}
         />
 
 

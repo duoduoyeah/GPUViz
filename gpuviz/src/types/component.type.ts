@@ -36,6 +36,8 @@ export interface ComponentNode {
 
   //get
   getName(): string;
+  getId(): string;
+  getType(): string;
   getInfo(): NodeInfo;
   getPorts(): Port[];
   getParent(): ComponentNode | undefined;

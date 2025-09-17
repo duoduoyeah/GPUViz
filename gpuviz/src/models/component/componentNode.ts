@@ -76,6 +76,14 @@ export class ComponentNodeImpl implements ComponentNode {
     return this.name;
   }
 
+  getId(): string {
+    const match = this.name.match(/\[(\d+)\]$/);
+    return match ? match[1] : "defaultId";
+  }
+
+  getType(): string {
+    return this.type;
+  }
   getInfo(): NodeInfo {
     return this.info;
   }

@@ -1,4 +1,4 @@
-import { ComponentTree } from "../../models/componentTree";
+import { ComponentTree } from "../../models/component/componentTree";
 import { ComponentNodeBuilder } from "../../models/dataLoader/jsonComponentBuilder";
 import type { JsonData, NodeInfo } from "../../types";
 import { testJsonPath } from "../../config/test";

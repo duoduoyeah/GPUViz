@@ -26,7 +26,6 @@ $ chainSight search level "SA" id
 available SAs: SA[0], SA[1], SA[2]
 ```
 
-
 ```bash
 chainSight select level <> id <> chain <>
 ```
@@ -40,6 +39,10 @@ interface ChainStoreState {
 ```
 
 * what about in the chainAnalyzer
--> the input here is a chain, i.e. a list of componentNodes that connects
-to each other
+-> the input here is a chain, i.e. a list of componentNodes that connects to each other
 -> backend messages api needs to be called here
+
+---
+
+## Design of Chainviewer 
+

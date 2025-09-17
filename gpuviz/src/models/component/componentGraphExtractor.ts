@@ -1,22 +1,20 @@
 import type {
   ComponentNode,
   Edge,
-  ComponentTree
-} from "../types";
-import { componentGraphEdgeHelper as edgeHelper } from "./edge/edgeHelper";
-import { componentHelper } from "./component/componentHelper";
-import { EdgeTypeMap } from "./edge/edgeTypeMap";
-import { ComponentBuilder } from "./component/combineComponentBuilder";
-import {PortBuilder} from "./port/portBuilder"
-import { CombinedPort } from "./port/port";
-import { PortHelper } from "./port/portHelper";
-import { EdgeBuilder } from "./edge/edgeBuilder"
+  ComponentViewer,
+  ComponentGraph
+} from "../../types";
+import { componentGraphEdgeHelper as edgeHelper } from "../edge/edgeHelper";
+import { componentHelper } from "./componentHelper";
+import { EdgeTypeMap } from "../edge/edgeTypeMap";
+import { CombinedComponentBuilder } from ".";
+import {PortBuilder} from "../port/portBuilder"
+import { CombinedPort } from "../port/port";
+import { PortHelper } from "../port/portHelper";
+import { EdgeBuilder } from "../edge/edgeBuilder"
 
 // Define the ComponentGraph type
-export type ComponentGraph = {
-  components: ComponentNode[];
-  edges: Edge[];
-};
+
 
 // Properly typed decorator function to validate component graph
 export function validateComponentGraph(
@@ -42,35 +40,38 @@ export function validateComponentGraph(
 }
 
 
-// Rename class to ComponentGraphExtractor which better reflects what it does
 export class ComponentGraphExtractor {
-
-  private tree: ComponentTree;
+ 
+  // persistent 
+  private componentViewer: ComponentViewer;
+  // current(temporary)
   private graph: ComponentGraph;
-  private componentTypeMap: Record<string, ComponentNode[]>;
+  private tempComponentTypeMap: Record<string, ComponentNode[]>;
   private edgeTypeMap: EdgeTypeMap;
 
-  constructor(tree: ComponentTree) {
-    this.tree = tree;
+  constructor(componentViewer: ComponentViewer) {
+    this.componentViewer = componentViewer;
     this.graph = {
       components: [],
       edges: []
     };
-    this.componentTypeMap = {};
+
+    this.tempComponentTypeMap = {};
     this.edgeTypeMap = new EdgeTypeMap();    
   }
+
 
   @validateComponentGraph
   updateComponentGraph(componentGraph: ComponentGraph) {
     this.graph = componentGraph;
-    this.updateComponentTypeMap();
+    this.updateTempComponentTypeMap();
     this.updateEdgeTypeMap();
   }
 
   @validateComponentGraph
   createGraphAtLevel(level: number): ComponentGraph {
     // Get components at the specified level directly from the tree
-    const components = this.tree.getNodesAtLevel(level);
+    const components = this.componentViewer.getTree().getNodesAtLevel(level);
     const edges: Edge[] = [];
 
     // Remove isolated nodes (modifies components array in-place)
@@ -100,7 +101,7 @@ export class ComponentGraphExtractor {
     childrenLevel: number = 1,
   ): ComponentGraph {
     // Find the component node by ID
-    const rootNode = this.tree.findNodeByName(componentId);
+    const rootNode = this.componentViewer.getTree().findNodeByName(componentId);
 
     if (!rootNode) {
       throw new Error(`Component with ID ${componentId} not found`);
@@ -137,19 +138,20 @@ export class ComponentGraphExtractor {
     return this.graph;
   }
 
-  private updateComponentTypeMap(): void {
+
+  private updateTempComponentTypeMap(): void {
     // Reset the component type map
-    this.componentTypeMap = {};
+    this.tempComponentTypeMap = {};
     
     // Group components by their type
     for (const component of this.graph.components) {
       const componentType = component.type;
       
-      if (!this.componentTypeMap[componentType]) {
-        this.componentTypeMap[componentType] = [];
+      if (!this.tempComponentTypeMap[componentType]) {
+        this.tempComponentTypeMap[componentType] = [];
       }
       
-      this.componentTypeMap[componentType].push(component);
+      this.tempComponentTypeMap[componentType].push(component);
     }
   }
 
@@ -163,8 +165,8 @@ export class ComponentGraphExtractor {
     }
   }
 
-  getComponentTypeMap(): Record<string, ComponentNode[]> {
-    return this.componentTypeMap;
+  getTempComponentTypeMap(): Record<string, ComponentNode[]> {
+    return this.tempComponentTypeMap;
   }
 
   getEdgeTypeMap(): EdgeTypeMap {
@@ -189,10 +191,10 @@ export class ComponentGraphExtractor {
     };
 
     // create new components
-    for (const type in this.componentTypeMap) {
-      const components = this.componentTypeMap[type];
+    for (const type in this.tempComponentTypeMap) {
+      const components = this.tempComponentTypeMap[type];
       if (components.length === 0) continue;
-      const combinedComponent = ComponentBuilder.combineComponents(components);
+      const combinedComponent = CombinedComponentBuilder.create(components).build();
       tidyGraph.components.push(combinedComponent);
     }
     

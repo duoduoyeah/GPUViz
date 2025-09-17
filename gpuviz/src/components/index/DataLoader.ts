@@ -1,6 +1,6 @@
 import useGpuStore from '../../store/topoStore';
 import {SqliteComponentNodeBuilder}  from '../../models/dataLoader';
-import { ComponentTreeImpl } from '../../models/componentTree';
+import { ComponentTreeImpl } from '../../models/component/componentTree';
 
 
 async function buildTopologyFromSQLite() {

@@ -1,8 +1,9 @@
 import type { CytoscapeGraph } from "../types/cytoscapeGraph.type";
 import { componentHelper } from "./component/componentHelper";
 import { baseEdgeHelper as edgeHelper } from "./edge/edgeHelper";
-import { ComponentGraphExtractor } from "./componentGraphBuilder";
-import type { ComponentGraph } from "./componentGraphBuilder";
+import { ComponentGraphExtractor } from "./component/componentGraphExtractor";
+import type { ComponentGraph } from "./component/componentGraphExtractor";
+
 /**
  * CytoscapeGraph class to build and manage cytoscape graph representations
  */
@@ -63,7 +64,7 @@ export class CytoscapeGraphBuilder {
     );
   }
 
-  selectComponent(componentId: string): CytoscapeGraph {
+  enterComponentView(componentId: string): CytoscapeGraph {
     return safeGraphReturn(
       () => this.graphExtractor.appendComponent(componentId),
       this

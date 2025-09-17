@@ -1,69 +1,91 @@
 import type { ComponentNode, NodeInfo, Port } from "../../types";
-import { ComponentNodeImpl } from "./componentNode";
+import { ComponentNodeImpl, BasicComponentBuilder} from ".";
 
-/**
- * Generates a combined name for a group of {@link ComponentNode} instances.
- * 
- * If the input array is empty, an error is thrown.
- * For names matching the pattern `"prefix.componentType[index]"` (e.g., `"GPU[1].SA[9]"`),
- * the function returns a name with the index replaced by `[Combined]` (e.g., `"GPU[1].SA[Combined]"`).
- * If the name does not match the pattern, `[Combined]` is appended to the original name.
- * 
- * @param components - An array of {@link ComponentNode} objects to combine.
- * @returns The combined name as a string.
- * @throws {Error} If the components array is empty.
- * 
- * @remarks
- * This function is useful for aggregating multiple components into a single logical group,
- * especially when visualizing or managing hierarchical GPU components.
- */
-export class ComponentBuilder {
+// Combined builder interface
+interface ICombinedBuilder {
+  build(): ComponentNodeImpl;
 
-    static getCombinedName(components: ComponentNode[]): string {
-        if (components.length === 0) {
-            throw new Error("Cannot combine empty components array");
-        }
-        const names = components.map(comp => comp.getName());
-        const regex = /(.*\.)?([^.\[\]]+)(\[\d+\])$/;
-        const match = names[0].match(regex);
-        if (match) {
-            const prefix = match[1] || "";
-            const componentType = match[2];
-            return `${prefix}${componentType}[Combined]`;
-        } else {
-            return `${names[0]}[Combined]`;
-        }
-    }
-
-    static combineComponents(components: ComponentNode[]): ComponentNode {
-        if (components.length === 0) {
-            throw new Error("Cannot combine empty components array");
-        }
-        // Create a new component with a combined name
-        const combinedName = ComponentBuilder.getCombinedName(components);
-        const combined = new ComponentNodeImpl(combinedName);
-        
-        // Empty Port
-        const combinePort: Port[] = [];
-        combined.setPorts(combinePort);
-        
-        // No children
-        const allChildren: ComponentNode[] = [];
-        combined.setChildren(allChildren);
-        
-        // Combine type (use the first component's type)
-        combined.setType(components[0].type);
-        
-        // Set shape
-        combined.setShape();
-        
-        // Set Subcomponents
-        combined.assignSubComponents(components);
-
-        // TODO in Future: NodeInfo is used.
-        const mergedInfo: NodeInfo = {};
-        combined.setInfo(mergedInfo);
-        
-        return combined;
-    }
+  getCombinedName(components: ComponentNode[]): string;
 }
+
+// Combined Component Builder
+export class CombinedComponentBuilder implements ICombinedBuilder {
+  private combinedComponent: ComponentNodeImpl;
+  private components: ComponentNode[];
+
+  constructor(components: ComponentNode[]) {
+    this.components = components;
+    const combinedName = this.getCombinedName(this.components)
+    this.combinedComponent =  BasicComponentBuilder.create(combinedName)
+      .withInfo({})
+      .withType(this.components[0].type)
+      .withShape()
+      .build();
+
+    const combinePort: Port[] = [];
+    this.combinedComponent.setPorts(combinePort);
+
+    const allChildren: ComponentNode[] = [];
+    this.combinedComponent.setChildren(allChildren);
+
+    this.combinedComponent.assignSubComponents(this.components);
+  }
+
+  getCombinedName(components: ComponentNode[]): string {
+    if (components.length === 0) {
+        throw new Error("Cannot combine empty components array");
+    }
+    const names = components.map(comp => comp.getName());
+    const regex = /(.*\.)?([^.\[\]]+)(\[\d+\])$/;
+    const match = names[0].match(regex);
+    if (match) {
+        const prefix = match[1] || "";
+        const componentType = match[2];
+        return `${prefix}${componentType}[Combined]`;
+    } else {
+        return `${names[0]}[Combined]`;
+    }
+  }
+
+  build(): ComponentNodeImpl {
+    return this.combinedComponent;
+  }
+
+  static create(components: ComponentNode[]): CombinedComponentBuilder {
+    return new CombinedComponentBuilder(components);
+  }
+
+}
+
+
+    // static combineComponents(components: ComponentNode[]): ComponentNode {
+    //     if (components.length === 0) {
+    //         throw new Error("Cannot combine empty components array");
+    //     }
+    //     // Create a new component with a combined name
+    //     const combinedName = CombinedComponentBuilder.getCombinedName(components);
+    //     const combined = new ComponentNodeImpl(combinedName);
+        
+    //     // Empty Port
+    //     const combinePort: Port[] = [];
+    //     combined.setPorts(combinePort);
+        
+    //     // No children
+    //     const allChildren: ComponentNode[] = [];
+    //     combined.setChildren(allChildren);
+        
+    //     // Combine type (use the first component's type)
+    //     combined.setType(components[0].type);
+        
+    //     // Set shape
+    //     combined.setShape();
+        
+    //     // Set Subcomponents
+    //     combined.assignSubComponents(components);
+
+    //     // TODO in Future: NodeInfo is used.
+    //     const mergedInfo: NodeInfo = {};
+    //     combined.setInfo(mergedInfo);
+        
+    //     return combined;
+    // }

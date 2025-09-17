@@ -6,14 +6,14 @@ interface InfoPanelProps {
   selectedNodeInfo: GraphNode | null;
   currentGraph: Graph | null;
   getNodeInfo: (id: string | null) => void;
-  selectComponent: (id: string) => void;
+  enterComponentView: (id: string) => void;
 }
 
 const InfoPanel: React.FC<InfoPanelProps> = ({
   selectedNodeInfo,
   currentGraph,
   getNodeInfo,
-  selectComponent,
+  enterComponentView,
 }) => {
   if (!selectedNodeInfo) {
     return null;
@@ -87,7 +87,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
         <div style={infoPanelStyles.componentInfoSectionTitle}>Actions</div>
         <div style={infoPanelStyles.componentInfoContent}>
           <button 
-            onClick={() => selectComponent(selectedNodeInfo.data.id)}
+            onClick={() => enterComponentView(selectedNodeInfo.data.id)}
             style={{
               ...infoPanelStyles.actionButton,
               ...infoPanelStyles.drillDownButton,

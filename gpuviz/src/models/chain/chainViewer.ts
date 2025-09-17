@@ -1,8 +1,6 @@
-// The names of this file and interface is not determined.
-import type { Chain, TrafficAnalyzer, ChainAnalyzer } from "./index";
+import type { ChainViewer } from "../../types";
 
-export interface ChainView {
-   
+export class ChainViewerImpl implements ChainViewer {
     chainLevel: string[];
     chainIndex: string[];
 
@@ -12,4 +10,8 @@ export interface ChainView {
     currentChain: Chain;
     currentChainLevel: string;
     currentChainIndex: string;
+
+    constructor() {
+        
+    }
 }

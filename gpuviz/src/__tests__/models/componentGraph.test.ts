@@ -1,5 +1,5 @@
-import { ComponentGraphExtractor } from "../../models/componentGraphBuilder";
-import { ComponentTree } from "../../models/componentTree";
+import { ComponentGraphExtractor } from "../../models/component/componentGraphExtractor";
+import { ComponentTree } from "../../models/component/componentTree";
 import { ComponentNodeBuilder } from "../../models/dataLoader/jsonComponentBuilder";
 import type { JsonData } from "../../types";
 import { testJsonPath } from "../../config/test";

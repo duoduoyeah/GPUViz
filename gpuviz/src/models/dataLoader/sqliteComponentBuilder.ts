@@ -7,7 +7,7 @@ import type {
 } from "../../types";
 import { PortImpl } from "../port/port";
 import { SQLITE_SERVER_PORT } from "../../config/default";
-import { ComponentBuilder } from "../component/componentBuilder";
+import { BasicComponentBuilder } from "../component";
 
 
 export class SqliteComponentNodeBuilder {
@@ -19,7 +19,7 @@ export class SqliteComponentNodeBuilder {
 
   constructor(defaultInfo: NodeInfo) {
     this.defaultInfo = defaultInfo;
-    this.rootComponent = new ComponentBuilder(this.rootComponentName)
+    this.rootComponent = BasicComponentBuilder.create(this.rootComponentName)
         .withInfo(this.defaultInfo)
         .withType(this.getType(this.rootComponentName))
         .withShape()
@@ -202,7 +202,7 @@ export class SqliteComponentNodeBuilder {
     }
 
     private initializeComponent(rawPort: TopologyPortEntry): ComponentNode {
-      return new ComponentBuilder(rawPort.component)
+      return BasicComponentBuilder.create(rawPort.component)
         .withInfo(this.defaultInfo)
         .withType(this.getType(rawPort.component))
         .withShape()
